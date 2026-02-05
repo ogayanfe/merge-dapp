@@ -22,7 +22,7 @@ const ScaffoldEthApp = ({ children }: { children: React.ReactNode }) => {
     <>
       <div className={`flex flex-col ${isLandingPage ? "min-h-screen" : "h-screen overflow-hidden"}`}>
         {isLandingPage ? <LandingHeader /> : <DashboardHeader />}
-        <main className={`relative flex flex-col flex-1 ${isLandingPage ? "" : "overflow-hidden"}`}>
+        <main className={`relative flex flex-col flex-1 ${isLandingPage ? "" : "overflow-y-auto"}`}>
           {children}
           {isLandingPage && <LandingFooter />}
         </main>
