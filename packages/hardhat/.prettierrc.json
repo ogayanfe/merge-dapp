@@ -8,7 +8,7 @@
     {
       "files": "*.sol",
       "options": {
-        "printWidth": 120,
+        "printWidth": 150,
         "tabWidth": 4,
         "singleQuote": false,
         "bracketSpacing": true
