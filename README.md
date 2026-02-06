@@ -1,83 +1,94 @@
-# 🏗 Scaffold-ETH 2
+# Merge — Decentralized Gig Marketplace
 
-<h4 align="center">
-  <a href="https://docs.scaffoldeth.io">Documentation</a> |
-  <a href="https://scaffoldeth.io">Website</a>
-</h4>
+Merge is a decentralized gig marketplace that lets clients post jobs and escrow payments on-chain while contractors complete work and claim payouts. This repository contains the smart contracts, deployment scripts, and a Next.js frontend used to demo and develop the Merge protocol.
 
-🧪 An open-source, up-to-date toolkit for building decentralized applications (dapps) on the Ethereum blockchain. It's designed to make it easier for developers to create and deploy smart contracts and build user interfaces that interact with those contracts.
+Key features
 
-> [!NOTE]
-> 🤖 Scaffold-ETH 2 is AI-ready! It has everything agents need to build on Ethereum. Check `.agents/`, `.claude/`, `.opencode` or `.cursor/` for more info.
+- On-chain job creation and management (Factory + Job contracts)
+- Secure escrow via `GigEscrow` with release and dispute support
+- Frontend UI for creating/listing jobs, accepting work, and handling payments
+- Local development scripts and a burner wallet experience for fast testing
 
-⚙️ Built using NextJS, RainbowKit, Hardhat, Wagmi, Viem, and Typescript.
+Tech stack
 
-- ✅ **Contract Hot Reload**: Your frontend auto-adapts to your smart contract as you edit it.
-- 🪝 **[Custom hooks](https://docs.scaffoldeth.io/hooks/)**: Collection of React hooks wrapper around [wagmi](https://wagmi.sh/) to simplify interactions with smart contracts with typescript autocompletion.
-- 🧱 [**Components**](https://docs.scaffoldeth.io/components/): Collection of common web3 components to quickly build your frontend.
-- 🔥 **Burner Wallet & Local Faucet**: Quickly test your application with a burner wallet and local faucet.
-- 🔐 **Integration with Wallet Providers**: Connect to different wallet providers and interact with the Ethereum network.
+- Solidity (contracts in `packages/hardhat/contracts`)
+- Hardhat for compilation, testing, and local network (`packages/hardhat`)
+- Next.js + TypeScript frontend (`packages/nextjs`)
+- Viem/Wagmi + RainbowKit for wallet and RPC integration
 
-![Debug Contracts tab](https://github.com/scaffold-eth/scaffold-eth-2/assets/55535804/b237af0c-5027-4849-a5c1-2e31495cccb1)
+Requirements
 
-## Requirements
+- Node.js (recommended >= 20)
+- Yarn (classic v1 or v2+)
+- Git
 
-Before you begin, you need to install the following tools:
+Quickstart (local development)
 
-- [Node (>= v20.18.3)](https://nodejs.org/en/download/)
-- Yarn ([v1](https://classic.yarnpkg.com/en/docs/install/) or [v2+](https://yarnpkg.com/getting-started/install))
-- [Git](https://git-scm.com/downloads)
+1. Clone repository and install dependencies from the repo root:
 
-## Quickstart
-
-To get started with Scaffold-ETH 2, follow the steps below:
-
-1. Install dependencies if it was skipped in CLI:
-
-```
-cd my-dapp-example
+```bash
+git clone <repo-url>
+cd merge
 yarn install
 ```
 
-2. Run a local network in the first terminal:
+2. Start a local chain in one terminal:
 
-```
+```bash
 yarn chain
 ```
 
-This command starts a local Ethereum network using Hardhat. The network runs on your local machine and can be used for testing and development. You can customize the network configuration in `packages/hardhat/hardhat.config.ts`.
+3. Deploy contracts to the local chain in a second terminal:
 
-3. On a second terminal, deploy the test contract:
-
-```
+```bash
 yarn deploy
 ```
 
-This command deploys a test smart contract to the local network. The contract is located in `packages/hardhat/contracts` and can be modified to suit your needs. The `yarn deploy` command uses the deploy script located in `packages/hardhat/deploy` to deploy the contract to the network. You can also customize the deploy script.
+4. Start the Next.js frontend in a third terminal:
 
-4. On a third terminal, start your NextJS app:
-
-```
+```bash
 yarn start
 ```
 
-Visit your app on: `http://localhost:3000`. You can interact with your smart contract using the `Debug Contracts` page. You can tweak the app config in `packages/nextjs/scaffold.config.ts`.
+Open http://localhost:3000 to use the app. The Debug/Contracts page lets you interact with deployed contracts and view events.
 
-Run smart contract test with `yarn hardhat:test`
+Development notes
 
-- Edit your smart contracts in `packages/hardhat/contracts`
-- Edit your frontend homepage at `packages/nextjs/app/page.tsx`. For guidance on [routing](https://nextjs.org/docs/app/building-your-application/routing/defining-routes) and configuring [pages/layouts](https://nextjs.org/docs/app/building-your-application/routing/pages-and-layouts) checkout the Next.js documentation.
-- Edit your deployment scripts in `packages/hardhat/deploy`
+- Contracts: `packages/hardhat/contracts` (see `GigEscrow.sol`, `MergeFactory.sol`)
+- Frontend: `packages/nextjs` (app router, pages under `app/`, components in `components/`)
+- Typechain types are generated into `packages/hardhat/typechain-types`
+- Useful scripts (in `packages/hardhat/scripts`): account generation and helper utilities
 
+Testing & formatting
 
-## Documentation
+- Run unit tests for contracts:
 
-Visit our [docs](https://docs.scaffoldeth.io) to learn how to start building with Scaffold-ETH 2.
+```bash
+yarn hardhat:test
+```
 
-To know more about its features, check out our [website](https://scaffoldeth.io).
+- Format codebase (root command runs format for all packages):
 
-## Contributing to Scaffold-ETH 2
+```bash
+yarn format
+```
 
-We welcome contributions to Scaffold-ETH 2!
+Environment & secrets
 
-Please see [CONTRIBUTING.MD](https://github.com/scaffold-eth/scaffold-eth-2/blob/main/CONTRIBUTING.md) for more information and guidelines for contributing to Scaffold-ETH 2.
+Add any RPC keys or API keys to `.env` at the repo root if you plan to connect to public testnets. Do not commit private keys.
+
+Repository layout (high level)
+
+- `packages/hardhat` — Solidity contracts, deployments, tests, Hardhat config
+- `packages/nextjs` — Frontend app (React + Next.js), hooks, components
+- `packages/hardhat/deploy` — Deployment scripts used by `yarn deploy`
+
+Contributing
+
+Contributions, issues, and feature requests are welcome. Please open issues or PRs. For large changes, open an issue first to discuss scope and design.
+
+License
+
+This project uses the repository license. See `LICENCE` at the repository root for details.
+
+If you want additional customization (project badges, screenshots, or developer docs), tell me what to include and I'll add it.
