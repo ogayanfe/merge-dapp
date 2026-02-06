@@ -5,7 +5,7 @@ import "hardhat/console.sol";
 
 // Use openzeppelin to inherit battle-tested implementations (ERC20, ERC721, etc)
 import "@openzeppelin/contracts/access/Ownable.sol";
-import { EscrowContract, VerificationMode } from "./EscrowContract.sol";
+import { GigEscrow, VerificationMode } from "./GigEscrow.sol";
 
 struct JobMetadata {
     uint256 index;
@@ -33,7 +33,7 @@ contract MergeFactory is Ownable {
 
     function postJob(string calldata _title, string memory _IPFSHash, string memory _repoURL, VerificationMode _verificationMode) external payable {
         if (msg.value == 0) revert InvalidAmount(); 
-        EscrowContract newEscrow = new EscrowContract{value: msg.value}(msg.sender, arbiter, _IPFSHash, _repoURL, _verificationMode);
+        GigEscrow newEscrow = new GigEscrow{value: msg.value}(msg.sender, arbiter, _IPFSHash, _repoURL, _verificationMode);
 
         JobMetadata memory newJob = JobMetadata({ bounty: msg.value, title: _title, index: jobs.length, client: msg.sender, escrowAddress: address(newEscrow), IPFSHash: _IPFSHash , postedTime: newEscrow.deployTime()});
 
