@@ -11,6 +11,7 @@ Key features
 
 Tech stack
 
+- Scaffoled ETH 2
 - Solidity (contracts in `packages/hardhat/contracts`)
 - Hardhat for compilation, testing, and local network (`packages/hardhat`)
 - Next.js + TypeScript frontend (`packages/nextjs`)
