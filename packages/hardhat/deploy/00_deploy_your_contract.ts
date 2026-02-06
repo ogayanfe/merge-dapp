@@ -34,6 +34,15 @@ const deployYourContract: DeployFunction = async function (hre: HardhatRuntimeEn
 
   // Get the deployed contract to interact with it after deploying.
   await hre.ethers.getContract<Contract>("MergeFactory", deployer);
+
+  // Deploy a template GigEscrow contract to export ABI
+  // await deploy("GigEscrow", {
+  //   from: deployer,
+  //   args: [deployer, deployer, "TEMPLATE", "TEMPLATE", 0], // Dummy args for template
+  //   log: true,
+  //   autoMine: true,
+  //   value: "100000000000000000", // 0.1 ETH
+  // });
 };
 
 export default deployYourContract;

@@ -16,6 +16,21 @@ enum EscrowState {
     CANCELLED
 }
 
+struct EscrowVariableState {
+    address client;
+    address freelancer;
+    address arbiter;
+    string IPFSHash;
+    string repoURL;
+    uint256 deployTime;
+    address[] applicants;
+    EscrowState state;
+    string title;
+    uint256 bounty;
+    uint256 autoReleaseDeadline;
+    VerificationMode verificationMode;
+}
+
 contract GigEscrow {
     // ERRORS
     error NotAuthorised();
@@ -33,6 +48,7 @@ contract GigEscrow {
     address public freelancer;
     address public arbiter;
     string public IPFSHash;
+    string public title;
     string public repoURL;
     uint256 public deployTime;
     address[] public applicants;
@@ -64,15 +80,23 @@ contract GigEscrow {
         _;
     }
 
-    constructor(address _client, address _arbiter, string memory _IPFSHash, string memory _repoURL, VerificationMode _mode) payable {
+    constructor(
+        string memory _title,
+        address _client,
+        address _arbiter,
+        string memory _IPFSHash,
+        string memory _repoURL,
+        VerificationMode _mode
+    ) payable {
         if (msg.value == 0) revert InvalidContractEthValue();
 
         client = _client;
         arbiter = _arbiter;
+        title = _title;
         IPFSHash = _IPFSHash;
         repoURL = _repoURL;
         verificationMode = _mode;
-        deployTime = block.timestamp; 
+        deployTime = block.timestamp;
     }
 
     function applyAsFreelancer() external {
@@ -128,5 +152,23 @@ contract GigEscrow {
     function resolveDispute(bool _payFreelancer) external onlyArbiter {
         state = _payFreelancer ? EscrowState.COMPLETED : EscrowState.CANCELLED;
         chargeDisputeFeed();
+    }
+
+    function getEscrowVariableState() external view returns (EscrowVariableState memory) {
+        return
+            EscrowVariableState({
+                client: client,
+                freelancer: freelancer,
+                arbiter: arbiter,
+                IPFSHash: IPFSHash,
+                repoURL: repoURL,
+                deployTime: deployTime,
+                applicants: applicants,
+                state: state,
+                title: title,
+                bounty: address(this).balance,
+                autoReleaseDeadline: autoReleaseDeadline,
+                verificationMode: verificationMode
+            });
     }
 }

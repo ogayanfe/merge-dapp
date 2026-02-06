@@ -7,7 +7,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   31337: {
     MergeFactory: {
-      address: "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9",
+      address: "0x5FbDB2315678afecb367f032d93F642f64180aa3",
       abi: [
         {
           inputs: [
@@ -72,6 +72,56 @@ const deployedContracts = {
           type: "event",
         },
         {
+          inputs: [],
+          name: "getJobs",
+          outputs: [
+            {
+              components: [
+                {
+                  internalType: "uint256",
+                  name: "index",
+                  type: "uint256",
+                },
+                {
+                  internalType: "address",
+                  name: "client",
+                  type: "address",
+                },
+                {
+                  internalType: "uint256",
+                  name: "bounty",
+                  type: "uint256",
+                },
+                {
+                  internalType: "string",
+                  name: "title",
+                  type: "string",
+                },
+                {
+                  internalType: "address",
+                  name: "escrowAddress",
+                  type: "address",
+                },
+                {
+                  internalType: "uint256",
+                  name: "postedTime",
+                  type: "uint256",
+                },
+                {
+                  internalType: "string",
+                  name: "IPFSHash",
+                  type: "string",
+                },
+              ],
+              internalType: "struct JobMetadata[]",
+              name: "",
+              type: "tuple[]",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
           inputs: [
             {
               internalType: "address",
@@ -94,9 +144,24 @@ const deployedContracts = {
                   type: "address",
                 },
                 {
+                  internalType: "uint256",
+                  name: "bounty",
+                  type: "uint256",
+                },
+                {
+                  internalType: "string",
+                  name: "title",
+                  type: "string",
+                },
+                {
                   internalType: "address",
                   name: "escrowAddress",
                   type: "address",
+                },
+                {
+                  internalType: "uint256",
+                  name: "postedTime",
+                  type: "uint256",
                 },
                 {
                   internalType: "string",
@@ -133,9 +198,24 @@ const deployedContracts = {
               type: "address",
             },
             {
+              internalType: "uint256",
+              name: "bounty",
+              type: "uint256",
+            },
+            {
+              internalType: "string",
+              name: "title",
+              type: "string",
+            },
+            {
               internalType: "address",
               name: "escrowAddress",
               type: "address",
+            },
+            {
+              internalType: "uint256",
+              name: "postedTime",
+              type: "uint256",
             },
             {
               internalType: "string",
@@ -161,6 +241,11 @@ const deployedContracts = {
         },
         {
           inputs: [
+            {
+              internalType: "string",
+              name: "_title",
+              type: "string",
+            },
             {
               internalType: "string",
               name: "_IPFSHash",
@@ -228,9 +313,24 @@ const deployedContracts = {
               type: "address",
             },
             {
+              internalType: "uint256",
+              name: "bounty",
+              type: "uint256",
+            },
+            {
+              internalType: "string",
+              name: "title",
+              type: "string",
+            },
+            {
               internalType: "address",
               name: "escrowAddress",
               type: "address",
+            },
+            {
+              internalType: "uint256",
+              name: "postedTime",
+              type: "uint256",
             },
             {
               internalType: "string",
@@ -247,7 +347,7 @@ const deployedContracts = {
         renounceOwnership: "@openzeppelin/contracts/access/Ownable.sol",
         transferOwnership: "@openzeppelin/contracts/access/Ownable.sol",
       },
-      deployedOnBlock: 5,
+      deployedOnBlock: 1,
     },
   },
 } as const;
