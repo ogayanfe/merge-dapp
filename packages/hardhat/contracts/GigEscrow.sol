@@ -16,7 +16,7 @@ enum EscrowState {
     CANCELLED
 }
 
-contract EscrowContract {
+contract GigEscrow {
     // ERRORS
     error NotAuthorised();
     error InvalidForContractState();
@@ -55,7 +55,7 @@ contract EscrowContract {
     }
 
     modifier onlyArbiter() {
-        if (msg.sender != freelancer) revert NotAuthorised();
+        if (msg.sender != arbiter) revert NotAuthorised();
         _;
     }
 
@@ -72,6 +72,7 @@ contract EscrowContract {
         IPFSHash = _IPFSHash;
         repoURL = _repoURL;
         verificationMode = _mode;
+        deployTime = block.timestamp; 
     }
 
     function applyAsFreelancer() external {
