@@ -7,14 +7,14 @@ import { ArrowRightIcon, BriefcaseIcon, ClockIcon } from "@heroicons/react/24/ou
 
 interface JobCardProps {
   job: {
-    index: bigint;
-    client: string;
-    bounty: bigint;
-    title: string;
-    escrowAddress: string;
-    postedTime: bigint;
-    IPFSHash: string;
-    tags?: [];
+    index?: bigint;
+    client?: string;
+    bounty?: bigint;
+    title?: string;
+    escrowAddress?: string;
+    postedTime?: bigint;
+    IPFSHash?: string;
+    tags?: string;
     difficulty?: [];
   };
   index: number;
@@ -44,11 +44,13 @@ export const JobCard = ({ job, index }: JobCardProps) => {
             </div>
             <div className="flex items-center gap-2">
               <ClockIcon className="h-3 w-3 opacity-30 text-primary" />
-              <span className="text-[10px] uppercase opacity-50 font-black">{convertBlockTime(job.postedTime)}</span>
+              <span className="text-[10px] uppercase opacity-50 font-black">
+                {convertBlockTime(job.postedTime ?? 0n)}
+              </span>
             </div>
           </div>
           <div className="flex flex-wrap gap-2">
-            {job.tags?.map(tag => (
+            {job.tags?.split(",").map(tag => (
               <span
                 key={tag}
                 className="px-2 py-0.5 border border-base-300 text-[9px] uppercase tracking-tighter font-black opacity-70 bg-base-200/50 group-hover:border-primary/50 transition-colors"
@@ -62,7 +64,7 @@ export const JobCard = ({ job, index }: JobCardProps) => {
           <div className="text-right">
             <span className="text-[10px] block opacity-30 uppercase font-black">Bounty</span>
             <span className="text-2xl font-black text-primary italic italic tracking-tighter group-hover:scale-105 transition-transform origin-right block">
-              {formatEther(job.bounty)} ETH
+              {formatEther(job.bounty ?? 0n)} ETH
             </span>
           </div>
           <Link

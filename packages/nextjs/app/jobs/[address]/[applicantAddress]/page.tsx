@@ -16,7 +16,7 @@ import {
 import { convertBlockTime } from "~~/components/jobs/utils";
 import useMutateEscrowContract from "~~/hooks/app/useMutateEscrow";
 import useQueryEscrowInfo from "~~/hooks/app/useQueryEscrow";
-import { IEscrowState, IJob } from "~~/types/jobs";
+import { IEscrowState } from "~~/types/jobs";
 
 export default function ApplicantDetailPage() {
   const params = useParams();
@@ -30,25 +30,10 @@ export default function ApplicantDetailPage() {
     isError,
   } = useQueryEscrowInfo<IEscrowState>(address, "getEscrowVariableState", connectedAddress);
 
-  // Re-create the job object with mock applicants to match the main page
-  // In a real app, this data would come from the backend or graph
-  const job: IJob | null = escrowState
-    ? {
-        ...escrowState,
-        address,
-        status: ["OPEN", "APPLYING", "LOCKED", "IN_REVIEW", "DISPUTED", "COMPLETED", "CANCELLED"][
-          escrowState.state
-        ] as IJob["status"],
-        description: "", // Not needed for this view
-        tags: [],
-        clientRep: 98,
-      }
-    : null;
-
   // Mock specific applicant data
   // In a real app we would fetch profile metadata for this address
-  const index = job?.applicants?.findIndex(a => a.applicant === applicantAddress) ?? -1;
-  const applicant = job?.applicants?.[index];
+  const index = escrowState?.applicants?.findIndex(a => a.applicant === applicantAddress) ?? -1;
+  const applicant = escrowState?.applicants?.[index];
 
   // Mock Metrics
   const mockMetrics = {
@@ -58,7 +43,7 @@ export default function ApplicantDetailPage() {
     github: "github.com/devUser",
   };
 
-  const isClient = connectedAddress === job?.client;
+  const isClient = connectedAddress === escrowState?.client;
   const { mutate: hire, isPending: isHiring } = useMutateEscrowContract(address, "hireFreelancer", [
     applicant?.applicant,
   ]);
@@ -71,7 +56,7 @@ export default function ApplicantDetailPage() {
     );
   }
 
-  if (isError || !job || !applicant) {
+  if (isError || !escrowState || !applicant) {
     return (
       <div className="flex flex-col h-full items-center justify-center bg-base-100 gap-4">
         <h1 className="text-2xl font-black uppercase text-error">Applicant Not Found</h1>
@@ -93,8 +78,9 @@ export default function ApplicantDetailPage() {
           >
             <ArrowLeftIcon className="h-3 w-3" /> Back to Job Details
           </Link>
-
-          {/* Applicant Profile Header */}
+          {/* Applicant Profile Header */}feat: read job listing from past events and not from list. Added loading and
+          no job indicator. Update smart contract filesfeat: read job listing from past events and not from list. Added
+          loading and no job indicator. Update smart contract files
           <section className="flex items-center gap-6 border-b border-base-300 pb-8">
             <div className="w-24 h-24 bg-base-200 rounded-full flex items-center justify-center border-2 border-primary/20">
               <UserCircleIcon className="w-12 h-12 opacity-50" />
@@ -113,7 +99,6 @@ export default function ApplicantDetailPage() {
               </div>
             </div>
           </section>
-
           {/* Metrics Grid */}
           <section className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="bg-base-200/50 p-6 border border-base-300 space-y-2">
@@ -131,7 +116,6 @@ export default function ApplicantDetailPage() {
               <div className="text-4xl font-black">{mockMetrics.completedJobs}</div>
             </div>
           </section>
-
           {/* Skills & Bio */}
           <section className="bg-base-200/50 border border-base-300 p-8 space-y-6">
             <div className="flex items-center gap-2 border-b border-base-300 pb-4">
@@ -149,7 +133,6 @@ export default function ApplicantDetailPage() {
               ))}
             </div>
           </section>
-
           {/* Client Actions */}
           {isClient && (
             <section className="pt-8 border-t border-base-300">

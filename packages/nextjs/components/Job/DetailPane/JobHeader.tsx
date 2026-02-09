@@ -26,7 +26,7 @@ export const JobHeader = ({ job }: { job: IJob }) => {
           {job.title}
         </h1>
         <div className="flex flex-wrap gap-2">
-          {job.tags.map(tag => (
+          {job.tags.split(",").map(tag => (
             <span
               key={tag}
               className="px-3 py-1 border border-base-300 bg-base-200 text-[10px] uppercase font-black opacity-70"

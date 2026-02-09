@@ -3,8 +3,8 @@ interface IEscrowState {
   freelancer: string;
   arbiter: string;
   IPFSHash: string;
-  repoURL: string;
   deployTime: bigint;
+  tags: string;
   applicants: { applicant: string; timestamp: bigint }[];
   state: number;
   title: string;
@@ -20,8 +20,8 @@ interface IEscrowState {
 interface IJob extends IEscrowState {
   address: string;
   status: "OPEN" | "APPLYING" | "LOCKED" | "IN_REVIEW" | "DISPUTED" | "COMPLETED" | "CANCELLED";
+  repoUrl: string;
   description: string;
-  tags: string[];
   clientRep: number;
   events?: { description: string; timestamp: number }[];
 }

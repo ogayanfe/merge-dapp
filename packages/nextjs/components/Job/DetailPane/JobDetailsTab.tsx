@@ -15,12 +15,12 @@ export const JobDetailsTab = ({ job }: { job: IJob }) => {
           <span className="text-[10px] uppercase font-black">Fork Repo</span>
         </div>
         <a
-          href={job.repoURL}
+          href={job.repoUrl}
           target="_blank"
           rel="noopener noreferrer"
           className="text-[10px] opacity-40 hover:opacity-100 hover:text-primary transition-all flex items-center gap-1"
         >
-          <LinkIcon className="h-3 w-3" /> {job.repoURL}
+          <LinkIcon className="h-3 w-3" /> {job.repoUrl}
         </a>
       </div>
     </section>

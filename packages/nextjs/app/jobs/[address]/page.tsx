@@ -45,10 +45,10 @@ export default function JobDetailPage() {
     status: ["OPEN", "APPLYING", "LOCKED", "IN_REVIEW", "DISPUTED", "COMPLETED", "CANCELLED"][
       escrowState.state
     ] as IJob["status"],
+    repoUrl: "",
 
     // Demo Data
     description: DEMO_DATA.description,
-    tags: DEMO_DATA.tags,
     clientRep: DEMO_DATA.clientRep,
     events: [
       { description: "Job Created", timestamp: Date.now() - 1000000 },

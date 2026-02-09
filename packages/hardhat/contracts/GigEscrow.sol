@@ -25,7 +25,7 @@ struct EscrowVariableState {
     address freelancer;
     address arbiter;
     string IPFSHash;
-    string repoURL;
+    string tags;
     uint256 deployTime;
     Applicant[] applicants;
     EscrowState state;
@@ -59,7 +59,7 @@ contract GigEscrow {
     address public arbiter;
     string public IPFSHash;
     string public title;
-    string public repoURL;
+    string public tags;
     uint256 public deployTime;
     Applicant[] public applicants;
     mapping(address => bool) public hasApplied;
@@ -96,7 +96,7 @@ contract GigEscrow {
         address _client,
         address _arbiter,
         string memory _IPFSHash,
-        string memory _repoURL,
+        string memory _tags,
         VerificationMode _mode
     ) payable {
         if (msg.value == 0) revert InvalidContractEthValue();
@@ -105,7 +105,7 @@ contract GigEscrow {
         arbiter = _arbiter;
         title = _title;
         IPFSHash = _IPFSHash;
-        repoURL = _repoURL;
+        tags = _tags;
         verificationMode = _mode;
         deployTime = block.timestamp;
     }
@@ -181,7 +181,7 @@ contract GigEscrow {
                 freelancer: freelancer,
                 arbiter: arbiter,
                 IPFSHash: IPFSHash,
-                repoURL: repoURL,
+                tags: tags,
                 deployTime: deployTime,
                 applicants: applicants,
                 state: state,

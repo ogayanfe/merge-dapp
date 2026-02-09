@@ -7,7 +7,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   31337: {
     MergeFactory: {
-      address: "0x0165878A594ca255338adfa4d48449f69242Eb8F",
+      address: "0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6",
       abi: [
         {
           inputs: [
@@ -51,6 +51,67 @@ const deployedContracts = {
           ],
           name: "OwnableUnauthorizedAccount",
           type: "error",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "uint256",
+              name: "index",
+              type: "uint256",
+            },
+            {
+              indexed: true,
+              internalType: "address",
+              name: "client",
+              type: "address",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "bounty",
+              type: "uint256",
+            },
+            {
+              indexed: false,
+              internalType: "string",
+              name: "title",
+              type: "string",
+            },
+            {
+              indexed: false,
+              internalType: "string",
+              name: "tags",
+              type: "string",
+            },
+            {
+              indexed: false,
+              internalType: "enum VerificationMode",
+              name: "verificationMode",
+              type: "uint8",
+            },
+            {
+              indexed: false,
+              internalType: "address",
+              name: "escrowAddress",
+              type: "address",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "postedTime",
+              type: "uint256",
+            },
+            {
+              indexed: false,
+              internalType: "string",
+              name: "IPFSHash",
+              type: "string",
+            },
+          ],
+          name: "JobCreated",
+          type: "event",
         },
         {
           anonymous: false,
@@ -253,7 +314,7 @@ const deployedContracts = {
             },
             {
               internalType: "string",
-              name: "_repoURL",
+              name: "tags",
               type: "string",
             },
             {
@@ -347,7 +408,7 @@ const deployedContracts = {
         renounceOwnership: "@openzeppelin/contracts/access/Ownable.sol",
         transferOwnership: "@openzeppelin/contracts/access/Ownable.sol",
       },
-      deployedOnBlock: 19,
+      deployedOnBlock: 37,
     },
   },
 } as const;

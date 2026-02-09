@@ -23,7 +23,7 @@
       },
       {
         "internalType": "string",
-        "name": "_repoURL",
+        "name": "_tags",
         "type": "string"
       },
       {
@@ -305,7 +305,7 @@
           },
           {
             "internalType": "string",
-            "name": "repoURL",
+            "name": "tags",
             "type": "string"
           },
           {
@@ -431,19 +431,6 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "repoURL",
-    "outputs": [
-      {
-        "internalType": "string",
-        "name": "",
-        "type": "string"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [
       {
         "internalType": "bool",
@@ -487,6 +474,19 @@
     "name": "submitWork",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "tags",
+    "outputs": [
+      {
+        "internalType": "string",
+        "name": "",
+        "type": "string"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
