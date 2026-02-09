@@ -11,6 +11,8 @@ interface IEscrowState {
   bounty: bigint;
   autoReleaseDeadline: bigint;
   verificationMode: number;
+  canApply: boolean;
+  applied: boolean;
 }
 
 interface IJob extends IEscrowState {

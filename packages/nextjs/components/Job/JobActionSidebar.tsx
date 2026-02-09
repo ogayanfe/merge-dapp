@@ -1,7 +1,11 @@
+import { useEffect } from "react";
 import { useParams } from "next/navigation";
 import { Address } from "@scaffold-ui/components";
+import { useQueryClient } from "@tanstack/react-query";
 import { formatEther } from "viem";
+import { useWaitForTransactionReceipt } from "wagmi";
 import { CheckCircleIcon, ClockIcon, ShieldCheckIcon, UserCircleIcon } from "@heroicons/react/24/outline";
+import useMutateEscrowContract from "~~/hooks/app/useMutateEscrow";
 import { IJob } from "~~/types/jobs";
 
 interface JobActionSidebarProps {
@@ -10,11 +14,23 @@ interface JobActionSidebarProps {
 
 export const JobActionSidebar = ({ job }: JobActionSidebarProps) => {
   const { address } = useParams() as { address: string };
+  const queryClient = useQueryClient();
+  const hasAccepted = false;
 
-  const { hasAccepted, isAccepting } = { hasAccepted: false, isAccepting: false };
+  const { mutate, hash, isPending, isError, error } = useMutateEscrowContract(address, "applyForJob");
+  const { isSuccess: isConfirmed, isLoading: isConfirming } = useWaitForTransactionReceipt({ hash });
+
+  console.log(isError, error);
+  useEffect(() => {
+    if (isConfirmed) {
+      console.log("Transaction Confirmed! Refreshing data...");
+      // This forces useReadContract hooks to fetch fresh data
+      queryClient.invalidateQueries();
+    }
+  }, [isConfirmed, queryClient]);
 
   function apply() {
-    console.log(address);
+    mutate();
   }
 
   return (
@@ -52,18 +68,17 @@ export const JobActionSidebar = ({ job }: JobActionSidebarProps) => {
           </div>
         ) : (
           <button
-            disabled
             onClick={apply}
-            // disabled={isAccepting || job.status !== "OPEN"}
+            disabled={job.applied || isPending || isConfirming}
             className={`w-full py-4 flex items-center justify-center gap-3 font-black uppercase text-sm transition-all shadow-xl
                         ${
-                          job.status === "OPEN"
+                          (job.status === "OPEN" || job.status == "APPLIED") && !job.applied
                             ? "bg-primary text-primary-content hover:shadow-brand-glow scale-100 hover:scale-[1.02]"
                             : "bg-base-200 text-base-content/20 border border-base-300 cursor-not-allowed"
                         }
                     `}
           >
-            {isAccepting ? (
+            {isPending || isConfirming ? (
               <>
                 <div className="w-4 h-4 border-2 border-white/20 border-t-white animate-spin rounded-full"></div>
                 Processing...
@@ -71,7 +86,7 @@ export const JobActionSidebar = ({ job }: JobActionSidebarProps) => {
             ) : (
               <>
                 <ShieldCheckIcon className="h-5 w-5" />
-                Apply For Job
+                {job.applied ? "Already Applied" : job.canApply ? "Apply For Job" : "Cannot Apply"}
               </>
             )}
           </button>

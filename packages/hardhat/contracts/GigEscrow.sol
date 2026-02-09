@@ -29,6 +29,8 @@ struct EscrowVariableState {
     uint256 bounty;
     uint256 autoReleaseDeadline;
     VerificationMode verificationMode;
+    bool applied;
+    bool canApply;
 }
 
 contract GigEscrow {
@@ -37,6 +39,8 @@ contract GigEscrow {
     error InvalidForContractState();
     error InvalidContractEthValue();
     error PaymentFailed();
+    error AlreadyApplied();
+    error InvalidTransactionSender();
 
     // EVENTS
     event ApplicationRecieved(address client, address applicant, uint256 timestamp);
@@ -52,6 +56,7 @@ contract GigEscrow {
     string public repoURL;
     uint256 public deployTime;
     address[] public applicants;
+    mapping(address => bool) public hasApplied;
     EscrowState public state;
     uint256 autoReleaseDeadline;
     VerificationMode public verificationMode;
@@ -99,8 +104,12 @@ contract GigEscrow {
         deployTime = block.timestamp;
     }
 
-    function applyAsFreelancer() external {
+    function applyForJob() external {
         if (state != EscrowState.OPEN && state != EscrowState.APPLIED) revert InvalidForContractState();
+        if (hasApplied[msg.sender]) revert AlreadyApplied();
+        if (msg.sender == client) revert InvalidTransactionSender();
+
+        hasApplied[msg.sender] = true;
         applicants.push(msg.sender);
         state = EscrowState.APPLIED;
     }
@@ -168,7 +177,9 @@ contract GigEscrow {
                 title: title,
                 bounty: address(this).balance,
                 autoReleaseDeadline: autoReleaseDeadline,
-                verificationMode: verificationMode
+                verificationMode: verificationMode,
+                applied: hasApplied[msg.sender],
+                canApply: (state == EscrowState.OPEN || state == EscrowState.APPLIED) && !hasApplied[msg.sender]
             });
     }
 }

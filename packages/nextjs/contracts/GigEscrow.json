@@ -37,12 +37,22 @@
   },
   {
     "inputs": [],
+    "name": "AlreadyApplied",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "InvalidContractEthValue",
     "type": "error"
   },
   {
     "inputs": [],
     "name": "InvalidForContractState",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InvalidTransactionSender",
     "type": "error"
   },
   {
@@ -164,7 +174,7 @@
   },
   {
     "inputs": [],
-    "name": "applyAsFreelancer",
+    "name": "applyForJob",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -320,11 +330,40 @@
             "internalType": "enum VerificationMode",
             "name": "verificationMode",
             "type": "uint8"
+          },
+          {
+            "internalType": "bool",
+            "name": "applied",
+            "type": "bool"
+          },
+          {
+            "internalType": "bool",
+            "name": "canApply",
+            "type": "bool"
           }
         ],
         "internalType": "struct EscrowVariableState",
         "name": "",
         "type": "tuple"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "hasApplied",
+    "outputs": [
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
       }
     ],
     "stateMutability": "view",

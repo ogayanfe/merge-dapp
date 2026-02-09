@@ -5,7 +5,6 @@ import { ActiveSprint } from "~~/components/jobs/ActiveSprint";
 import { JobCard } from "~~/components/jobs/JobCard";
 import { JobHeader } from "~~/components/jobs/JobHeader";
 import { JobSidebar } from "~~/components/jobs/JobSidebar";
-import { JOBS } from "~~/components/jobs/jobData";
 import { useScaffoldReadContract } from "~~/hooks/scaffold-eth";
 
 const JobsPage = () => {
@@ -19,7 +18,7 @@ const JobsPage = () => {
   return (
     <div className="flex h-full bg-base-100 font-mono text-base-content overflow-hidden">
       {/* Sidebar - Fixate */}
-      <JobSidebar activeTab={activeTab} setActiveTab={setActiveTab} jobsCount={JOBS.length} />
+      <JobSidebar activeTab={activeTab} setActiveTab={setActiveTab} jobsCount={jobs?.length ?? 0} />
 
       {/* Main Feed */}
       <main className="flex-1 flex flex-col h-full bg-base-100">
