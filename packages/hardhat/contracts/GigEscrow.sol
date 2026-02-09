@@ -15,6 +15,10 @@ enum EscrowState {
     COMPLETED,
     CANCELLED
 }
+struct Applicant {
+    address applicant;
+    uint256 timestamp;
+}
 
 struct EscrowVariableState {
     address client;
@@ -23,7 +27,7 @@ struct EscrowVariableState {
     string IPFSHash;
     string repoURL;
     uint256 deployTime;
-    address[] applicants;
+    Applicant[] applicants;
     EscrowState state;
     string title;
     uint256 bounty;
@@ -31,6 +35,8 @@ struct EscrowVariableState {
     VerificationMode verificationMode;
     bool applied;
     bool canApply;
+    bool isClient;
+    bool isArbiter;
 }
 
 contract GigEscrow {
@@ -55,7 +61,7 @@ contract GigEscrow {
     string public title;
     string public repoURL;
     uint256 public deployTime;
-    address[] public applicants;
+    Applicant[] public applicants;
     mapping(address => bool) public hasApplied;
     EscrowState public state;
     uint256 autoReleaseDeadline;
@@ -110,7 +116,7 @@ contract GigEscrow {
         if (msg.sender == client) revert InvalidTransactionSender();
 
         hasApplied[msg.sender] = true;
-        applicants.push(msg.sender);
+        applicants.push(Applicant({ applicant: msg.sender, timestamp: block.timestamp }));
         state = EscrowState.APPLIED;
     }
 
@@ -134,6 +140,11 @@ contract GigEscrow {
     function dispute() external onlyClient inState(EscrowState.IN_REVIEW) {
         state = EscrowState.DISPUTED;
         emit DisputeRaised(msg.sender, block.timestamp, verificationMode);
+    }
+
+    function cancelJob() external onlyClient {
+        if (state != EscrowState.OPEN && state != EscrowState.APPLIED) revert InvalidForContractState();
+        state = EscrowState.CANCELLED;
     }
 
     function autoRelease() external inState(EscrowState.IN_REVIEW) {
@@ -179,7 +190,12 @@ contract GigEscrow {
                 autoReleaseDeadline: autoReleaseDeadline,
                 verificationMode: verificationMode,
                 applied: hasApplied[msg.sender],
-                canApply: (state == EscrowState.OPEN || state == EscrowState.APPLIED) && !hasApplied[msg.sender]
+                canApply: (state == EscrowState.OPEN || state == EscrowState.APPLIED) &&
+                    !hasApplied[msg.sender] &&
+                    client != msg.sender &&
+                    arbiter != msg.sender,
+                isClient: client == msg.sender,
+                isArbiter: arbiter == msg.sender
             });
     }
 }

@@ -165,8 +165,13 @@
     "outputs": [
       {
         "internalType": "address",
-        "name": "",
+        "name": "applicant",
         "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "timestamp",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -195,6 +200,13 @@
   {
     "inputs": [],
     "name": "autoRelease",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "cancelJob",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -302,9 +314,21 @@
             "type": "uint256"
           },
           {
-            "internalType": "address[]",
+            "components": [
+              {
+                "internalType": "address",
+                "name": "applicant",
+                "type": "address"
+              },
+              {
+                "internalType": "uint256",
+                "name": "timestamp",
+                "type": "uint256"
+              }
+            ],
+            "internalType": "struct Applicant[]",
             "name": "applicants",
-            "type": "address[]"
+            "type": "tuple[]"
           },
           {
             "internalType": "enum EscrowState",
@@ -339,6 +363,16 @@
           {
             "internalType": "bool",
             "name": "canApply",
+            "type": "bool"
+          },
+          {
+            "internalType": "bool",
+            "name": "isClient",
+            "type": "bool"
+          },
+          {
+            "internalType": "bool",
+            "name": "isArbiter",
             "type": "bool"
           }
         ],

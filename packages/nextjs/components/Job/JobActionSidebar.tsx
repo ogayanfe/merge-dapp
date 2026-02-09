@@ -3,8 +3,17 @@ import { useParams } from "next/navigation";
 import { Address } from "@scaffold-ui/components";
 import { useQueryClient } from "@tanstack/react-query";
 import { formatEther } from "viem";
-import { useWaitForTransactionReceipt } from "wagmi";
-import { CheckCircleIcon, ClockIcon, ShieldCheckIcon, UserCircleIcon } from "@heroicons/react/24/outline";
+import { useAccount, useWaitForTransactionReceipt } from "wagmi";
+import {
+  BanknotesIcon,
+  CheckCircleIcon,
+  ClockIcon,
+  ShieldCheckIcon,
+  TrashIcon,
+  UserCircleIcon,
+  XCircleIcon,
+} from "@heroicons/react/24/outline";
+import { RainbowKitCustomConnectButton } from "~~/components/scaffold-eth";
 import useMutateEscrowContract from "~~/hooks/app/useMutateEscrow";
 import { IJob } from "~~/types/jobs";
 
@@ -15,23 +24,65 @@ interface JobActionSidebarProps {
 export const JobActionSidebar = ({ job }: JobActionSidebarProps) => {
   const { address } = useParams() as { address: string };
   const queryClient = useQueryClient();
-  const hasAccepted = false;
+  const { address: connectedAddress } = useAccount();
 
-  const { mutate, hash, isPending, isError, error } = useMutateEscrowContract(address, "applyForJob");
-  const { isSuccess: isConfirmed, isLoading: isConfirming } = useWaitForTransactionReceipt({ hash });
+  const isClient = job.isClient;
+  const isFreelancer = connectedAddress === job.freelancer;
+  const isArbiter = job.isArbiter;
 
-  console.log(isError, error);
+  const { mutate: apply, isPending: isApplying, hash: applyHash } = useMutateEscrowContract(address, "applyForJob");
+  const {
+    mutate: refundClient,
+    isPending: isRefunding,
+    hash: refundClientHash,
+  } = useMutateEscrowContract(address, "refundClient");
+  const {
+    mutate: payFreelancer,
+    isPending: isPaying,
+    hash: payFreelancerHash,
+  } = useMutateEscrowContract(address, "payFreelancer");
+  const {
+    mutate: resolveToFreelancer,
+    isPending: isResolvingToFreelancer,
+    hash: resolveToFreelancerHash,
+  } = useMutateEscrowContract(address, "resolveDispute", [true]);
+  const {
+    mutate: resolveToClient,
+    isPending: isResolvingToClient,
+    hash: resolveToClientHash,
+  } = useMutateEscrowContract(address, "resolveDispute", [false]);
+  const {
+    mutate: cancelJob,
+    isPending: isCancellingJob,
+    hash: cancelJobHash,
+  } = useMutateEscrowContract(address, "cancelJob");
+
+  const hash =
+    applyHash ??
+    refundClientHash ??
+    payFreelancerHash ??
+    resolveToFreelancerHash ??
+    resolveToClientHash ??
+    cancelJobHash;
+
+  const { isSuccess: isConfirmed, isLoading: isConfirming } = useWaitForTransactionReceipt({
+    hash,
+  });
+
+  const isActionPending =
+    isApplying ||
+    isRefunding ||
+    isPaying ||
+    isResolvingToFreelancer ||
+    isResolvingToClient ||
+    isConfirming ||
+    isCancellingJob;
+
   useEffect(() => {
     if (isConfirmed) {
-      console.log("Transaction Confirmed! Refreshing data...");
-      // This forces useReadContract hooks to fetch fresh data
       queryClient.invalidateQueries();
     }
   }, [isConfirmed, queryClient]);
-
-  function apply() {
-    mutate();
-  }
 
   return (
     <aside className="w-96 border-l border-base-300 bg-base-200/30 flex flex-col h-full shadow-2xl">
@@ -56,45 +107,136 @@ export const JobActionSidebar = ({ job }: JobActionSidebarProps) => {
           </div>
         </div>
 
-        {hasAccepted ? (
+        {/* Client Actions */}
+        {isClient && (
           <div className="space-y-4">
-            <div className="bg-primary/10 border border-primary/20 p-4 flex items-center gap-3">
-              <CheckCircleIcon className="h-5 w-5 text-primary" />
-              <span className="text-[10px] font-black uppercase text-primary">Mission Accepted</span>
-            </div>
-            <button className="w-full py-4 bg-primary text-primary-content font-black uppercase text-xs hover:bg-primary/90 transition-all shadow-brand-glow">
-              [ Submit Proof of Work ]
-            </button>
-          </div>
-        ) : (
-          <button
-            onClick={apply}
-            disabled={job.applied || isPending || isConfirming}
-            className={`w-full py-4 flex items-center justify-center gap-3 font-black uppercase text-sm transition-all shadow-xl
-                        ${
-                          (job.status === "OPEN" || job.status == "APPLIED") && !job.applied
-                            ? "bg-primary text-primary-content hover:shadow-brand-glow scale-100 hover:scale-[1.02]"
-                            : "bg-base-200 text-base-content/20 border border-base-300 cursor-not-allowed"
-                        }
-                    `}
-          >
-            {isPending || isConfirming ? (
-              <>
-                <div className="w-4 h-4 border-2 border-white/20 border-t-white animate-spin rounded-full"></div>
-                Processing...
-              </>
-            ) : (
-              <>
-                <ShieldCheckIcon className="h-5 w-5" />
-                {job.applied ? "Already Applied" : job.canApply ? "Apply For Job" : "Cannot Apply"}
-              </>
+            {(job.status === "OPEN" || job.status === "APPLYING") && (
+              <button
+                onClick={() => cancelJob()}
+                disabled={isActionPending}
+                className="w-full py-4 bg-error/10 text-error border border-error/20 font-black uppercase text-xs hover:bg-error/20 transition-all flex items-center justify-center gap-2"
+              >
+                {isActionPending ? (
+                  <span className="loading loading-spinner loading-xs"></span>
+                ) : (
+                  <TrashIcon className="h-4 w-4" />
+                )}
+                Cancel Job
+              </button>
             )}
+            {job.status === "CANCELLED" && (
+              <button
+                onClick={() => refundClient()}
+                disabled={isActionPending}
+                className="w-full py-4 bg-primary text-primary-content font-black uppercase text-xs hover:bg-primary/90 transition-all shadow-brand-glow flex items-center justify-center gap-2"
+              >
+                {isActionPending ? (
+                  <span className="loading loading-spinner loading-xs"></span>
+                ) : (
+                  <BanknotesIcon className="h-4 w-4" />
+                )}
+                Withdraw Funds
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* Freelancer Actions */}
+        {isFreelancer && job.status === "COMPLETED" && (
+          <button
+            onClick={() => payFreelancer()}
+            disabled={isActionPending}
+            className="w-full py-4 bg-success text-success-content font-black uppercase text-xs hover:bg-success/90 transition-all shadow-brand-glow flex items-center justify-center gap-2"
+          >
+            {isPaying ? (
+              <span className="loading loading-spinner loading-xs"></span>
+            ) : (
+              <BanknotesIcon className="h-4 w-4" />
+            )}
+            Withdraw Payment
           </button>
         )}
 
-        <p className="mt-4 text-[9px] text-center opacity-40 uppercase leading-relaxed font-black">
-          Accepting this job will lock your <br /> profile to this mission.
-        </p>
+        {/* Arbiter Actions */}
+        {isArbiter && job.status === "DISPUTED" && (
+          <div className="grid grid-cols-2 gap-4">
+            <button
+              onClick={() => resolveToFreelancer()}
+              disabled={isActionPending}
+              className="py-4 bg-success text-success-content font-black uppercase text-[10px] hover:bg-success/90 transition-all flex flex-col items-center justify-center gap-1"
+            >
+              {isResolvingToFreelancer ? (
+                <span className="loading loading-spinner loading-xs"></span>
+              ) : (
+                <CheckCircleIcon className="h-4 w-4" />
+              )}
+              Pay Freelancer
+            </button>
+            <button
+              onClick={() => resolveToClient()}
+              disabled={isActionPending}
+              className="py-4 bg-error text-error-content font-black uppercase text-[10px] hover:bg-error/90 transition-all flex flex-col items-center justify-center gap-1"
+            >
+              {isResolvingToClient ? (
+                <span className="loading loading-spinner loading-xs"></span>
+              ) : (
+                <XCircleIcon className="h-4 w-4" />
+              )}
+              Refund Client
+            </button>
+          </div>
+        )}
+
+        {/* Applicant / Guest Actions */}
+        {!isClient && !isFreelancer && !isArbiter && (
+          <div className="space-y-4">
+            {!connectedAddress ? (
+              <div className="flex flex-col gap-2">
+                <RainbowKitCustomConnectButton />
+                <p className="text-[10px] text-center opacity-40 uppercase">Connect wallet to apply</p>
+              </div>
+            ) : (
+              <button
+                onClick={() => apply()}
+                disabled={job.applied || isActionPending || !job.canApply}
+                className={`w-full py-4 flex items-center justify-center gap-3 font-black uppercase text-sm transition-all shadow-xl
+                                    ${
+                                      (job.status === "OPEN" || job.status === "APPLYING") &&
+                                      job.canApply &&
+                                      !job.applied
+                                        ? "bg-primary text-primary-content hover:shadow-brand-glow scale-100 hover:scale-[1.02]"
+                                        : "bg-base-200 text-base-content/20 border border-base-300 cursor-not-allowed"
+                                    }
+                                `}
+              >
+                {isApplying ? (
+                  <>
+                    <div className="w-4 h-4 border-2 border-white/20 border-t-white animate-spin rounded-full"></div>
+                    Processing...
+                  </>
+                ) : (
+                  <>
+                    <ShieldCheckIcon className="h-5 w-5" />
+                    {job.status == "CANCELLED"
+                      ? "JOB CANCELLED"
+                      : job.applied
+                        ? "Already Applied"
+                        : job.canApply
+                          ? "Apply For Job"
+                          : "Cannot Apply"}
+                  </>
+                )}
+              </button>
+            )}
+          </div>
+        )}
+
+        {/* Information Text */}
+        {!isClient && !isFreelancer && !isArbiter && connectedAddress && job.status === "OPEN" && !job.applied && (
+          <p className="mt-4 text-[9px] text-center opacity-40 uppercase leading-relaxed font-black">
+            Accepting this job will lock your <br /> profile to this mission.
+          </p>
+        )}
       </div>
 
       <div className="flex-1 overflow-y-auto p-8 space-y-8">
@@ -131,7 +273,7 @@ export const JobActionSidebar = ({ job }: JobActionSidebarProps) => {
               <span className="opacity-20 italic">14:55</span>
               <span className="opacity-60 uppercase">Contract Funds Verified</span>
             </div>
-            {hasAccepted && (
+            {job.freelancer === connectedAddress && (
               <div className="flex gap-3 text-primary">
                 <span className="opacity-50 italic">18:42</span>
                 <span className="font-black uppercase tracking-widest">Protocol Accepted By You</span>

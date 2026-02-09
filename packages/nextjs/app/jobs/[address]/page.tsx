@@ -6,7 +6,6 @@ import { useAccount } from "wagmi";
 import { JobActionSidebar } from "~~/components/Job/JobActionSidebar";
 import { JobDetailPane } from "~~/components/Job/JobDetailPane";
 import DEMO_DATA from "~~/components/Job/data";
-import { convertBlockTime } from "~~/components/jobs/utils";
 import useQueryEscrowInfo from "~~/hooks/app/useQueryEscrow";
 import { IEscrowState, IJob } from "~~/types/jobs";
 
@@ -46,12 +45,15 @@ export default function JobDetailPage() {
     status: ["OPEN", "APPLYING", "LOCKED", "IN_REVIEW", "DISPUTED", "COMPLETED", "CANCELLED"][
       escrowState.state
     ] as IJob["status"],
-    postedTime: convertBlockTime(escrowState.deployTime),
 
     // Demo Data
     description: DEMO_DATA.description,
     tags: DEMO_DATA.tags,
     clientRep: DEMO_DATA.clientRep,
+    events: [
+      { description: "Job Created", timestamp: Date.now() - 1000000 },
+      { description: "Funds Deposited", timestamp: Date.now() - 900000 },
+    ],
   };
 
   return (
