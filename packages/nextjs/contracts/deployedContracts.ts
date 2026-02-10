@@ -7,7 +7,7 @@ import { GenericContractsDeclaration } from "~~/utils/scaffold-eth/contract";
 const deployedContracts = {
   31337: {
     MergeFactory: {
-      address: "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+      address: "0x0165878A594ca255338adfa4d48449f69242Eb8F",
       abi: [
         {
           inputs: [
@@ -133,8 +133,63 @@ const deployedContracts = {
           type: "event",
         },
         {
-          inputs: [],
-          name: "getJobs",
+          inputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          name: "escrowStates",
+          outputs: [
+            {
+              internalType: "uint256",
+              name: "index",
+              type: "uint256",
+            },
+            {
+              internalType: "address",
+              name: "client",
+              type: "address",
+            },
+            {
+              internalType: "uint256",
+              name: "bounty",
+              type: "uint256",
+            },
+            {
+              internalType: "string",
+              name: "title",
+              type: "string",
+            },
+            {
+              internalType: "address",
+              name: "escrowAddress",
+              type: "address",
+            },
+            {
+              internalType: "uint256",
+              name: "postedTime",
+              type: "uint256",
+            },
+            {
+              internalType: "string",
+              name: "IPFSHash",
+              type: "string",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "_escrowAddress",
+              type: "address",
+            },
+          ],
+          name: "getJobByEscrowAddress",
           outputs: [
             {
               components: [
@@ -174,23 +229,17 @@ const deployedContracts = {
                   type: "string",
                 },
               ],
-              internalType: "struct JobMetadata[]",
+              internalType: "struct JobMetadata",
               name: "",
-              type: "tuple[]",
+              type: "tuple",
             },
           ],
           stateMutability: "view",
           type: "function",
         },
         {
-          inputs: [
-            {
-              internalType: "address",
-              name: "_client",
-              type: "address",
-            },
-          ],
-          name: "getJobsByClient",
+          inputs: [],
+          name: "getJobs",
           outputs: [
             {
               components: [
@@ -348,67 +397,13 @@ const deployedContracts = {
           stateMutability: "nonpayable",
           type: "function",
         },
-        {
-          inputs: [
-            {
-              internalType: "address",
-              name: "",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "",
-              type: "uint256",
-            },
-          ],
-          name: "userJobs",
-          outputs: [
-            {
-              internalType: "uint256",
-              name: "index",
-              type: "uint256",
-            },
-            {
-              internalType: "address",
-              name: "client",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "bounty",
-              type: "uint256",
-            },
-            {
-              internalType: "string",
-              name: "title",
-              type: "string",
-            },
-            {
-              internalType: "address",
-              name: "escrowAddress",
-              type: "address",
-            },
-            {
-              internalType: "uint256",
-              name: "postedTime",
-              type: "uint256",
-            },
-            {
-              internalType: "string",
-              name: "IPFSHash",
-              type: "string",
-            },
-          ],
-          stateMutability: "view",
-          type: "function",
-        },
       ],
       inheritedFunctions: {
         owner: "@openzeppelin/contracts/access/Ownable.sol",
         renounceOwnership: "@openzeppelin/contracts/access/Ownable.sol",
         transferOwnership: "@openzeppelin/contracts/access/Ownable.sol",
       },
-      deployedOnBlock: 1,
+      deployedOnBlock: 10,
     },
   },
 } as const;

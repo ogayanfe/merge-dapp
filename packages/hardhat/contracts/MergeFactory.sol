@@ -24,7 +24,7 @@ contract MergeFactory is Ownable {
     // STATE VARIABLES
     address arbiter;
     JobMetadata[] public jobs;
-    mapping(address => JobMetadata[]) public userJobs;
+    mapping(address => JobMetadata) public escrowStates;
 
     // EVENTS
     event JobCreated(
@@ -70,11 +70,11 @@ contract MergeFactory is Ownable {
         );
 
         jobs.push(newJob);
-        userJobs[msg.sender].push(newJob);
+        escrowStates[address(newEscrow)] = newJob;
     }
 
-    function getJobsByClient(address _client) external view returns (JobMetadata[] memory) {
-        return userJobs[_client];
+    function getJobByEscrowAddress(address _escrowAddress) external view returns (JobMetadata memory) {
+        return escrowStates[_escrowAddress];
     }
 
     function getJobs() external view returns (JobMetadata[] memory) {
