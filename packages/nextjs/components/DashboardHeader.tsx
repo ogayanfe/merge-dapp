@@ -4,18 +4,23 @@ import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ThemeModeToggle } from "./ThemeModeToggle";
-import { BriefcaseIcon, ChartBarIcon, PlusIcon, Squares2X2Icon } from "@heroicons/react/24/outline";
+import { useAccount } from "wagmi";
+import { ChartBarIcon, PlusIcon, Squares2X2Icon, UserCircleIcon } from "@heroicons/react/24/outline";
 import { RainbowKitCustomConnectButton } from "~~/components/scaffold-eth";
 
 export const DashboardHeader = () => {
   const pathname = usePathname();
+  const { address } = useAccount();
 
   const navItems = [
     { label: "Overview", href: "/jobs", icon: Squares2X2Icon },
-    { label: "My Jobs", href: "/jobs/active", icon: BriefcaseIcon },
     { label: "Post Job", href: "/jobs/new", icon: PlusIcon },
     { label: "Stats", href: "/leaderboard", icon: ChartBarIcon },
   ];
+
+  if (address) {
+    navItems.push({ label: "My Profile", href: `/user/${address}`, icon: UserCircleIcon });
+  }
 
   return (
     <header className="h-14 bg-base-100 border-b border-base-300 flex items-center justify-between px-4 shrink-0 z-50">
