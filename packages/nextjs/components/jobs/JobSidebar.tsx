@@ -1,10 +1,12 @@
 import React, { useState } from "react";
 import Link from "next/link";
+import { useAccount } from "wagmi";
 import { PlusIcon } from "@heroicons/react/24/outline";
+import { useUserStats } from "~~/hooks/app/useUserStats";
 
 interface JobSidebarProps {
-  activeTab: string;
-  setActiveTab: (tab: string) => void;
+  activeTab: "feed" | "active";
+  setActiveTab: (tab: "feed" | "active") => void;
   jobsCount: number;
   selectedTags: string[];
   toggleTag: (tag: string) => void;
@@ -15,6 +17,8 @@ const AVAILABLE_TAGS = ["SOLIDITY", "REACT", "RUST", "DESIGN", "WRITING", "BACKE
 export const JobSidebar = ({ activeTab, setActiveTab, jobsCount, selectedTags, toggleTag }: JobSidebarProps) => {
   const [customTags, setCustomTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState("");
+  const { address } = useAccount();
+  const { stats } = useUserStats(address);
 
   const handleAddTag = (e: React.FormEvent) => {
     e.preventDefault();
@@ -69,10 +73,12 @@ export const JobSidebar = ({ activeTab, setActiveTab, jobsCount, selectedTags, t
                 : "bg-base-100 border-base-300 hover:border-primary/50"
             }`}
           >
-            <span className="text-xs font-black uppercase">My Active Job</span>
+            <span className="text-xs font-black uppercase">Posted Jobs</span>
             <div className="flex items-center gap-1">
               <span className="w-1.5 h-1.5 rounded-full bg-success animate-pulse shadow-success-glow"></span>
-              <span className="text-[10px] opacity-70">1 Running</span>
+              <span className="text-[10px] opacity-70">
+                {stats?.posted} {stats.posted == stats.completed ? "Completed" : "Jobs"}
+              </span>
             </div>
           </button>
         </div>
@@ -120,7 +126,9 @@ export const JobSidebar = ({ activeTab, setActiveTab, jobsCount, selectedTags, t
           <h3 className="text-[10px] font-black uppercase tracking-[0.2em] opacity-30 mb-4">Earnings</h3>
           <div className="bg-base-100/50 border border-base-300 p-4 rounded-sm shadow-sm">
             <span className="text-[10px] opacity-40 block mb-1 font-black">Total Withdrawn</span>
-            <span className="text-xl font-black italic text-primary">12.50 ETH</span>
+            <span className="text-xl font-black italic text-primary">
+              {Math.round(Number(stats?.totalVolume ?? 0) * 1000) / 1000} ETH
+            </span>
           </div>
         </div>
       </div>

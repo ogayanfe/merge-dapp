@@ -2,10 +2,12 @@ import { useMemo, useState } from "react";
 import { formatEther } from "viem";
 
 export type SortOption = "newest" | "oldest" | "highest_bounty" | "lowest_bounty";
+export type VerificationFilter = "ALL" | "GIT" | "MANUAL";
 
-export const useJobFilterSort = (jobs: any[] | undefined) => {
+export const useJobFilterSort = (jobs: any[] | undefined, filterKey?: string, filterValue?: string) => {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [sortOption, setSortOption] = useState<SortOption>("newest");
+  const [verificationFilter, setVerificationFilter] = useState<VerificationFilter>("ALL");
 
   const toggleTag = (tag: string) => {
     setSelectedTags(prev => (prev.includes(tag) ? prev.filter(t => t !== tag) : [...prev, tag]));
@@ -16,8 +18,19 @@ export const useJobFilterSort = (jobs: any[] | undefined) => {
 
     let result = [...jobs];
 
-    // 1. Filter by Tags (OR logic: match any selected tag)
-    // If no tags selected, show all.
+    // 1. Filter by Verification Mode
+    if (verificationFilter !== "ALL") {
+      result = result.filter(job => {
+        // verificationMode: 0 = Manual, 1 = Git (based on previous logic)
+        // Ensure we handle both string/number/bigint potentially returned by wagmi/viem
+        const mode = Number(job.verificationMode);
+        if (verificationFilter === "GIT") return mode === 1;
+        if (verificationFilter === "MANUAL") return mode === 0;
+        return true;
+      });
+    }
+
+    // 2. Filter by Tags (OR logic: match any selected tag)
     if (selectedTags.length > 0) {
       result = result.filter(job => {
         if (!job.tags) return false;
@@ -30,7 +43,11 @@ export const useJobFilterSort = (jobs: any[] | undefined) => {
       });
     }
 
-    // 2. Sort
+    if (filterKey && filterValue) {
+      result = result.filter(job => job[filterKey] === filterValue);
+    }
+
+    // 3. Sort
     result.sort((a, b) => {
       switch (sortOption) {
         case "newest":
@@ -49,7 +66,7 @@ export const useJobFilterSort = (jobs: any[] | undefined) => {
     });
 
     return result;
-  }, [jobs, selectedTags, sortOption]);
+  }, [jobs, selectedTags, sortOption, verificationFilter, filterKey, filterValue]);
 
   return {
     filteredJobs: filteredAndSortedJobs,
@@ -57,5 +74,7 @@ export const useJobFilterSort = (jobs: any[] | undefined) => {
     toggleTag,
     sortOption,
     setSortOption: (value: SortOption) => setSortOption(value),
+    verificationFilter,
+    setVerificationFilter,
   };
 };

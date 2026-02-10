@@ -1,17 +1,17 @@
 "use client";
 
 import React, { useState } from "react";
-import { ActiveSprint } from "~~/components/jobs/ActiveSprint";
-import { JobCard } from "~~/components/jobs/JobCard";
+import { useAccount } from "wagmi";
+import { JobFeed } from "~~/components/jobs/JobFeed";
+import { JobFeedHeader } from "~~/components/jobs/JobFeedHeader";
 import { JobHeader } from "~~/components/jobs/JobHeader";
-import { JobLoader } from "~~/components/jobs/JobLoader";
 import { JobSidebar } from "~~/components/jobs/JobSidebar";
-import { NoJobsFound } from "~~/components/jobs/NoJobsFound";
 import { useJobFilterSort } from "~~/hooks/jobs/useJobFilterSort";
 import { useScaffoldEventHistory } from "~~/hooks/scaffold-eth";
 
 const JobsPage = () => {
-  const [activeTab, setActiveTab] = useState("feed");
+  const [activeTab, setActiveTab] = useState<"feed" | "active">("feed");
+  const { address } = useAccount();
 
   const { data: events, isLoading } = useScaffoldEventHistory({
     contractName: "MergeFactory",
@@ -20,8 +20,18 @@ const JobsPage = () => {
     watch: true,
   });
 
-  const { filteredJobs, selectedTags, toggleTag, sortOption, setSortOption } = useJobFilterSort(
+  const {
+    filteredJobs,
+    selectedTags,
+    toggleTag,
+    sortOption,
+    setSortOption,
+    verificationFilter,
+    setVerificationFilter,
+  } = useJobFilterSort(
     events?.map(e => e.args),
+    activeTab === "active" ? "client" : undefined,
+    activeTab == "active" ? address : undefined,
   );
 
   return (
@@ -40,19 +50,15 @@ const JobsPage = () => {
         <JobHeader sortOption={sortOption} setSortOption={setSortOption} />
 
         <div className="flex-1 overflow-y-auto p-8 bg-grid-pattern bg-[size:40px_40px] opacity-[0.98]">
-          {activeTab === "feed" ? (
-            <div className="max-w-4xl mx-auto space-y-4 pb-12">
-              {isLoading ? (
-                <JobLoader />
-              ) : !filteredJobs || filteredJobs.length === 0 ? (
-                <NoJobsFound />
-              ) : (
-                filteredJobs.map((job, i) => <JobCard key={job.escrowAddress} job={job} index={i} />)
-              )}
-            </div>
-          ) : (
-            <ActiveSprint />
-          )}
+          <div className="max-w-4xl mx-auto space-y-4 pb-12">
+            <JobFeedHeader
+              activeTab={activeTab}
+              verificationFilter={verificationFilter}
+              setVerificationFilter={setVerificationFilter}
+            />
+
+            <JobFeed isLoading={isLoading} jobs={filteredJobs} />
+          </div>
         </div>
       </main>
     </div>
