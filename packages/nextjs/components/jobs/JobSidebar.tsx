@@ -1,13 +1,42 @@
-import React from "react";
+import React, { useState } from "react";
 import Link from "next/link";
+import { PlusIcon } from "@heroicons/react/24/outline";
 
 interface JobSidebarProps {
   activeTab: string;
   setActiveTab: (tab: string) => void;
   jobsCount: number;
+  selectedTags: string[];
+  toggleTag: (tag: string) => void;
 }
 
-export const JobSidebar = ({ activeTab, setActiveTab, jobsCount }: JobSidebarProps) => {
+const AVAILABLE_TAGS = ["SOLIDITY", "REACT", "RUST", "DESIGN", "WRITING", "BACKEND"];
+
+export const JobSidebar = ({ activeTab, setActiveTab, jobsCount, selectedTags, toggleTag }: JobSidebarProps) => {
+  const [customTags, setCustomTags] = useState<string[]>([]);
+  const [tagInput, setTagInput] = useState("");
+
+  const handleAddTag = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!tagInput.trim()) return;
+
+    const newTag = tagInput.trim().toUpperCase();
+
+    // Add to custom tags if not exists in either list
+    if (!AVAILABLE_TAGS.includes(newTag) && !customTags.includes(newTag)) {
+      setCustomTags([...customTags, newTag]);
+    }
+
+    // Auto select the new tag
+    if (!selectedTags.includes(newTag)) {
+      toggleTag(newTag);
+    }
+
+    setTagInput("");
+  };
+
+  const allTags = [...AVAILABLE_TAGS, ...customTags];
+
   return (
     <aside className="w-80 border-r border-base-300 flex flex-col h-full bg-base-200/30 shadow-inner block">
       <div className="p-6 border-b border-base-300">
@@ -51,16 +80,41 @@ export const JobSidebar = ({ activeTab, setActiveTab, jobsCount }: JobSidebarPro
 
       <div className="flex-1 overflow-y-auto p-6 scrollbar-hide">
         <h3 className="text-[10px] font-black uppercase tracking-[0.2em] opacity-30 mb-4">Quick Filters</h3>
-        <div className="space-y-2">
-          {["Solidity", "React", "Rust", "Design", "Writing"].map(tag => (
-            <label key={tag} className="flex items-center gap-3 cursor-pointer group">
-              <input type="checkbox" className="checkbox checkbox-xs rounded-none border-primary checkbox-primary" />
-              <span className="text-[11px] uppercase opacity-60 group-hover:opacity-100 group-hover:text-primary transition-all font-black tracking-tighter">
+
+        <div className="grid grid-cols-2 gap-2">
+          {allTags.map(tag => (
+            <label key={tag} className="flex items-center gap-2 cursor-pointer group min-w-0">
+              <input
+                type="checkbox"
+                checked={selectedTags.includes(tag)}
+                onChange={() => toggleTag(tag)}
+                className="checkbox checkbox-xs rounded-none border-primary checkbox-primary shrink-0"
+              />
+              <span
+                className={`text-[10px] uppercase truncate transition-all font-black tracking-tighter ${selectedTags.includes(tag) ? "text-primary opacity-100" : "opacity-60 group-hover:opacity-100 group-hover:text-primary"}`}
+              >
                 {tag}
               </span>
             </label>
           ))}
         </div>
+
+        <form onSubmit={handleAddTag} className="mt-4 relative">
+          <input
+            type="text"
+            value={tagInput}
+            onChange={e => setTagInput(e.target.value)}
+            placeholder="ADD TAG..."
+            className="w-full bg-base-100 border border-base-300 p-2 text-[10px] font-mono uppercase focus:border-primary focus:outline-none placeholder:opacity-30 pr-8"
+          />
+          <button
+            type="submit"
+            className="absolute right-2 top-1/2 -translate-y-1/2 text-primary hover:scale-110 transition-transform"
+            disabled={!tagInput.trim()}
+          >
+            <PlusIcon className="h-3 w-3" />
+          </button>
+        </form>
 
         <div className="mt-12">
           <h3 className="text-[10px] font-black uppercase tracking-[0.2em] opacity-30 mb-4">Earnings</h3>

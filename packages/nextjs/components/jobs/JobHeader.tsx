@@ -4,7 +4,14 @@ import { AdjustmentsHorizontalIcon, MagnifyingGlassIcon } from "@heroicons/react
 import { useIdentifyAddress } from "~~/hooks/app/useIdentifyAddress";
 import { notification } from "~~/utils/scaffold-eth";
 
-export const JobHeader = () => {
+type option = "newest" | "oldest" | "highest_bounty" | "lowest_bounty";
+
+interface JobHeaderProps {
+  sortOption: option;
+  setSortOption: (option: option) => void;
+}
+
+export const JobHeader = ({ sortOption, setSortOption }: JobHeaderProps) => {
   const [address, setAddress] = useState<`0x${string}`>(`0x`);
   const [type, checking] = useIdentifyAddress(address);
   const router = useRouter();
@@ -24,7 +31,6 @@ export const JobHeader = () => {
     router.push(`/user/${address}/`);
   }, [type, checking]);
 
-  console.log(type);
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   return (
@@ -45,10 +51,15 @@ export const JobHeader = () => {
       </form>
       <div className="flex items-center gap-4">
         <span className="text-[10px] opacity-30 uppercase font-black">Sort by:</span>
-        <select className="bg-transparent text-[10px] font-black uppercase outline-none border-none cursor-pointer text-primary">
-          <option>Newest First</option>
-          <option>Highest Bounty</option>
-          <option>Shortest Duration</option>
+        <select
+          value={sortOption}
+          onChange={e => setSortOption(e.target.value as option)}
+          className="bg-transparent text-[10px] font-black uppercase outline-none border-none cursor-pointer text-primary"
+        >
+          <option value="newest">Newest First</option>
+          <option value="oldest">Oldest First</option>
+          <option value="highest_bounty">Highest Bounty</option>
+          <option value="lowest_bounty">Lowest Bounty</option>
         </select>
         <button className="p-2 border border-base-300 hover:border-primary hover:text-primary transition-colors">
           <AdjustmentsHorizontalIcon className="h-4 w-4" />
