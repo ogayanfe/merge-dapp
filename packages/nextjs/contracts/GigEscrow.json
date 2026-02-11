@@ -52,6 +52,11 @@
   },
   {
     "inputs": [],
+    "name": "InvalidPullRequestUrl",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "InvalidTransactionSender",
     "type": "error"
   },
@@ -470,7 +475,13 @@
     "type": "function"
   },
   {
-    "inputs": [],
+    "inputs": [
+      {
+        "internalType": "string",
+        "name": "pullRequestUrl",
+        "type": "string"
+      }
+    ],
     "name": "submitWork",
     "outputs": [],
     "stateMutability": "nonpayable",

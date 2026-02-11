@@ -1,11 +1,12 @@
 import { useEffect } from "react";
 import { useParams } from "next/navigation";
+import { ClientControls } from "./Sidebar/ClientControls";
+import { FreelancerControls } from "./Sidebar/FreelancerControls";
 import { Address } from "@scaffold-ui/components";
 import { useQueryClient } from "@tanstack/react-query";
 import { formatEther } from "viem";
 import { useAccount, useWaitForTransactionReceipt } from "wagmi";
 import {
-  BanknotesIcon,
   CheckCircleIcon,
   ClockIcon,
   ShieldCheckIcon,
@@ -30,17 +31,8 @@ export const JobActionSidebar = ({ job }: JobActionSidebarProps) => {
   const isFreelancer = connectedAddress === job.freelancer;
   const isArbiter = job.isArbiter;
 
+  // Keep Arbiter/Shared apply logic here for now (or move to separate components if needed)
   const { mutate: apply, isPending: isApplying, hash: applyHash } = useMutateEscrowContract(address, "applyForJob");
-  const {
-    mutate: refundClient,
-    isPending: isRefunding,
-    hash: refundClientHash,
-  } = useMutateEscrowContract(address, "refundClient");
-  const {
-    mutate: payFreelancer,
-    isPending: isPaying,
-    hash: payFreelancerHash,
-  } = useMutateEscrowContract(address, "payFreelancer");
   const {
     mutate: resolveToFreelancer,
     isPending: isResolvingToFreelancer,
@@ -57,26 +49,14 @@ export const JobActionSidebar = ({ job }: JobActionSidebarProps) => {
     hash: cancelJobHash,
   } = useMutateEscrowContract(address, "cancelJob");
 
-  const hash =
-    applyHash ??
-    refundClientHash ??
-    payFreelancerHash ??
-    resolveToFreelancerHash ??
-    resolveToClientHash ??
-    cancelJobHash;
+  const hash = applyHash ?? resolveToFreelancerHash ?? resolveToClientHash ?? cancelJobHash;
 
   const { isSuccess: isConfirmed, isLoading: isConfirming } = useWaitForTransactionReceipt({
     hash,
   });
 
   const isActionPending =
-    isApplying ||
-    isRefunding ||
-    isPaying ||
-    isResolvingToFreelancer ||
-    isResolvingToClient ||
-    isConfirming ||
-    isCancellingJob;
+    isApplying || isResolvingToFreelancer || isResolvingToClient || isConfirming || isCancellingJob;
 
   useEffect(() => {
     if (isConfirmed) {
@@ -107,53 +87,23 @@ export const JobActionSidebar = ({ job }: JobActionSidebarProps) => {
           </div>
         </div>
 
-        {/* Client Actions */}
-        {isClient && (
-          <div className="space-y-4">
-            {(job.status === "OPEN" || job.status === "APPLYING") && (
-              <button
-                onClick={() => cancelJob()}
-                disabled={isActionPending}
-                className="w-full py-4 bg-error/10 text-error border border-error/20 font-black uppercase text-xs hover:bg-error/20 transition-all flex items-center justify-center gap-2"
-              >
-                {isActionPending ? (
-                  <span className="loading loading-spinner loading-xs"></span>
-                ) : (
-                  <TrashIcon className="h-4 w-4" />
-                )}
-                Cancel Job
-              </button>
-            )}
-            {job.status === "CANCELLED" && (
-              <button
-                onClick={() => refundClient()}
-                disabled={isActionPending}
-                className="w-full py-4 bg-primary text-primary-content font-black uppercase text-xs hover:bg-primary/90 transition-all shadow-brand-glow flex items-center justify-center gap-2"
-              >
-                {isActionPending ? (
-                  <span className="loading loading-spinner loading-xs"></span>
-                ) : (
-                  <BanknotesIcon className="h-4 w-4" />
-                )}
-                Withdraw Funds
-              </button>
-            )}
-          </div>
-        )}
+        {/* MODULAR CONTROLS */}
+        {isClient && <ClientControls job={job} />}
+        {isFreelancer && <FreelancerControls job={job} />}
 
-        {/* Freelancer Actions */}
-        {isFreelancer && job.status === "COMPLETED" && (
+        {/* Client Cancel (Pre-Lock) - Can stay here or move to ClientControls if we pass cancel logic */}
+        {isClient && (job.status === "OPEN" || job.status === "APPLYING") && (
           <button
-            onClick={() => payFreelancer()}
+            onClick={() => cancelJob()}
             disabled={isActionPending}
-            className="w-full py-4 bg-success text-success-content font-black uppercase text-xs hover:bg-success/90 transition-all shadow-brand-glow flex items-center justify-center gap-2"
+            className="w-full py-4 bg-error/10 text-error border border-error/20 font-black uppercase text-xs hover:bg-error/20 transition-all flex items-center justify-center gap-2 mt-4"
           >
-            {isPaying ? (
+            {isActionPending ? (
               <span className="loading loading-spinner loading-xs"></span>
             ) : (
-              <BanknotesIcon className="h-4 w-4" />
+              <TrashIcon className="h-4 w-4" />
             )}
-            Withdraw Payment
+            Cancel Job
           </button>
         )}
 
@@ -231,10 +181,22 @@ export const JobActionSidebar = ({ job }: JobActionSidebarProps) => {
           </div>
         )}
 
-        {/* Information Text */}
-        {!isClient && !isFreelancer && !isArbiter && connectedAddress && job.status === "OPEN" && !job.applied && (
-          <p className="mt-4 text-[9px] text-center opacity-40 uppercase leading-relaxed font-black">
-            Accepting this job will lock your <br /> profile to this mission.
+        {/* Withdrawal State Info (Non-interactive) */}
+        {job.status === "COMPLETED" && job.bounty === 0n && !isFreelancer && (
+          <div className="mt-4 w-full py-3 bg-base-200 border border-base-300 text-base-content/50 font-black uppercase text-[10px] flex items-center justify-center gap-2">
+            <CheckCircleIcon className="h-3 w-3" /> Funds Withdrawn by Freelancer
+          </div>
+        )}
+        {job.status === "CANCELLED" && job.bounty === 0n && !isClient && (
+          <div className="mt-4 w-full py-3 bg-base-200 border border-base-300 text-base-content/50 font-black uppercase text-[10px] flex items-center justify-center gap-2">
+            <CheckCircleIcon className="h-3 w-3" /> Funds Withdrawn by Client
+          </div>
+        )}
+
+        {/* Dispute Fee Note */}
+        {job.status === "DISPUTED" && (
+          <p className="mt-4 text-[9px] text-center text-warning opacity-80 uppercase leading-relaxed font-black">
+            Note: 1% fee is deducted from disputed contracts.
           </p>
         )}
       </div>
@@ -242,21 +204,36 @@ export const JobActionSidebar = ({ job }: JobActionSidebarProps) => {
       <div className="flex-1 overflow-y-auto p-8 space-y-8">
         <div>
           <h3 className="text-[10px] font-black uppercase tracking-[0.2em] opacity-30 mb-6 flex items-center gap-2">
-            <UserCircleIcon className="h-4 w-4" /> Client Integrity
+            <UserCircleIcon className="h-4 w-4" /> Participants
           </h3>
           <div className="space-y-4">
+            {/* Client */}
             <div className="flex justify-between items-end">
               <span className="text-xs font-black uppercase">
                 <Address address={job.client} />
               </span>
-              <span className="text-[10px] opacity-50">Score: {job.clientRep}%</span>
+              <span className="text-[10px] opacity-50">Client</span>
             </div>
-            <div className="w-full h-1 bg-base-300">
-              <div className="h-full bg-primary shadow-brand-glow" style={{ width: `${job.clientRep}%` }}></div>
-            </div>
-            <p className="text-[9px] opacity-40 uppercase leading-relaxed font-black">
-              VERIFIED CLIENT. ALL PREVIOUS PAYMENTS SETTLED ON-CHAIN.
-            </p>
+
+            {/* Freelancer */}
+            {job.freelancer && job.freelancer !== "0x0000000000000000000000000000000000000000" && (
+              <div className="flex justify-between items-end pt-2 border-t border-base-content/5">
+                <span className="text-xs font-black uppercase">
+                  <Address address={job.freelancer} />
+                </span>
+                <span className="text-[10px] opacity-50">Freelancer</span>
+              </div>
+            )}
+
+            {/* Arbiter */}
+            {job.arbiter && job.arbiter !== "0x0000000000000000000000000000000000000000" && (
+              <div className="flex justify-between items-end pt-2 border-t border-base-content/5">
+                <span className="text-xs font-black uppercase">
+                  <Address address={job.arbiter} />
+                </span>
+                <span className="text-[10px] opacity-50">Arbiter</span>
+              </div>
+            )}
           </div>
         </div>
 
