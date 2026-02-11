@@ -468,6 +468,19 @@
   },
   {
     "inputs": [],
+    "name": "deployBlock",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "deployTime",
     "outputs": [
       {
@@ -546,6 +559,11 @@
           {
             "internalType": "uint256",
             "name": "deployTime",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "deployBlock",
             "type": "uint256"
           },
           {

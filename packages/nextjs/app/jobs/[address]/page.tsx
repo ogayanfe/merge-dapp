@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { useCallback } from "react";
 import { notFound, useParams } from "next/navigation";
 import { useAccount } from "wagmi";
 import { JobActionSidebar } from "~~/components/Job/JobActionSidebar";
@@ -28,7 +28,12 @@ export default function JobDetailPage() {
     data: escrowState,
     isLoading,
     isError,
+    refetch,
   } = useQueryEscrowInfo<IEscrowState>(address, "getEscrowVariableState", connectedAddress);
+
+  const handleEvent = useCallback(() => {
+    refetch();
+  }, [refetch]);
 
   if (isLoading) {
     return <Loading />;
@@ -50,16 +55,12 @@ export default function JobDetailPage() {
     // Demo Data
     description: DEMO_DATA.description,
     clientRep: DEMO_DATA.clientRep,
-    events: [
-      { description: "Job Created", timestamp: Date.now() - 1000000 },
-      { description: "Funds Deposited", timestamp: Date.now() - 900000 },
-    ],
   };
 
   return (
     <div className="flex h-full bg-base-100 font-mono text-base-content overflow-hidden">
       {/* Detail Pane */}
-      <JobDetailPane job={job} />
+      <JobDetailPane job={job} onEvent={handleEvent} />
 
       {/* Action Sidebar */}
       <JobActionSidebar job={job} />

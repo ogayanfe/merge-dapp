@@ -126,7 +126,7 @@ const CreateJobPage: NextPage = () => {
       router.push("/jobs");
       return;
     }
-  }, [isConfirmed]);
+  }, [isConfirmed, router]);
 
   return (
     <div className="flex h-full bg-base-100 font-mono text-base-content overflow-hidden">

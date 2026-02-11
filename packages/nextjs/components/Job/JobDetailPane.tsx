@@ -8,11 +8,12 @@ import { IJob } from "~~/types/jobs";
 
 interface JobDetailPaneProps {
   job: IJob;
+  onEvent?: () => void;
 }
 
 type TabType = "details" | "applicants" | "events";
 
-export const JobDetailPane = ({ job }: JobDetailPaneProps) => {
+export const JobDetailPane = ({ job, onEvent }: JobDetailPaneProps) => {
   const [activeTab, setActiveTab] = useState<TabType>("details");
 
   return (
@@ -63,9 +64,7 @@ export const JobDetailPane = ({ job }: JobDetailPaneProps) => {
             <div className="flex items-center gap-2">
               <ClockIcon className="h-4 w-4" />
               Events
-              <span className="ml-1 bg-base-300 text-[9px] px-1.5 py-0.5 rounded-full opacity-60">
-                {job.events?.length || 0}
-              </span>
+              <span className="ml-1 bg-base-300 text-[9px] px-1.5 py-0.5 rounded-full opacity-60">{"-"}</span>
             </div>
           </button>
         </div>
@@ -74,7 +73,7 @@ export const JobDetailPane = ({ job }: JobDetailPaneProps) => {
         <div className="min-h-[300px]">
           {activeTab === "details" && <JobDetailsTab job={job} />}
           {activeTab === "applicants" && <JobApplicantsTab job={job} />}
-          {activeTab === "events" && <JobEventsTab job={job} />}
+          {activeTab === "events" && <JobEventsTab job={job} onEvent={onEvent} />}
         </div>
       </div>
     </main>

@@ -4,6 +4,7 @@ interface IEscrowState {
   arbiter: string;
   IPFSHash: string;
   deployTime: bigint;
+  deployBlock: bigint;
   tags: string;
   applicants: { applicant: string; timestamp: bigint }[];
   state: number;
@@ -23,7 +24,6 @@ interface IJob extends IEscrowState {
   repoUrl: string;
   description: string;
   clientRep: number;
-  events?: { description: string; timestamp: number }[];
 }
 
 export type { IJob, IEscrowState };

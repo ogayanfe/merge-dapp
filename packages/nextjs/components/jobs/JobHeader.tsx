@@ -29,7 +29,7 @@ export const JobHeader = ({ sortOption, setSortOption }: JobHeaderProps) => {
       return;
     }
     router.push(`/user/${address}/`);
-  }, [type, checking]);
+  }, [type, checking, address, router]);
 
   const inputRef = useRef<HTMLInputElement | null>(null);
 

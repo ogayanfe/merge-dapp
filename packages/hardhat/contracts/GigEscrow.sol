@@ -27,6 +27,7 @@ struct EscrowVariableState {
     string IPFSHash;
     string tags;
     uint256 deployTime;
+    uint256 deployBlock;
     Applicant[] applicants;
     EscrowState state;
     string title;
@@ -80,6 +81,7 @@ contract GigEscrow {
     string public title;
     string public tags;
     uint256 public deployTime;
+    uint256 public deployBlock;
     Applicant[] public applicants;
     mapping(address => bool) public hasApplied;
     EscrowState public state;
@@ -127,6 +129,7 @@ contract GigEscrow {
         tags = _tags;
         verificationMode = _mode;
         deployTime = block.timestamp;
+        deployBlock = block.number;
         emit JobCreated(0, _client, msg.value, _title, _tags, _mode, address(this), block.timestamp, _IPFSHash);
     }
 
@@ -237,6 +240,7 @@ contract GigEscrow {
                 IPFSHash: IPFSHash,
                 tags: tags,
                 deployTime: deployTime,
+                deployBlock: deployBlock,
                 applicants: applicants,
                 state: state,
                 title: title,
