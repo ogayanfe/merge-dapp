@@ -24,8 +24,8 @@ export const useJobFilterSort = (jobs: any[] | undefined, filterKey?: string, fi
         // verificationMode: 0 = Manual, 1 = Git (based on previous logic)
         // Ensure we handle both string/number/bigint potentially returned by wagmi/viem
         const mode = Number(job.verificationMode);
-        if (verificationFilter === "GIT") return mode === 1;
-        if (verificationFilter === "MANUAL") return mode === 0;
+        if (verificationFilter === "GIT") return mode === 0;
+        if (verificationFilter === "MANUAL") return mode === 1;
         return true;
       });
     }

@@ -103,7 +103,7 @@ const CreateJobPage: NextPage = () => {
       });
       console.log("Uploaded to IPFS:", ipfsHash);
 
-      const verificationMode = protocolType === "git" ? 1 : 0;
+      const verificationMode = protocolType === "git" ? 0 : 1;
 
       const txHash = await writeContractAsync({
         functionName: "postJob",
