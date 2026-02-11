@@ -16,7 +16,6 @@ const JobsPage = () => {
   const { data: events, isLoading } = useScaffoldEventHistory({
     contractName: "MergeFactory",
     eventName: "JobCreated",
-    fromBlock: 0n,
     watch: true,
   });
 
