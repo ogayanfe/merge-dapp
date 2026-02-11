@@ -51,8 +51,26 @@ contract GigEscrow {
 
     // EVENTS
     event ApplicationRecieved(address client, address applicant, uint256 timestamp);
+    event FreelancerHired(address client, address freelancer, uint256 timestamp);
     event JobSubmitted(address freelancer, uint256 timestamp, VerificationMode mode);
     event DisputeRaised(address client, uint256 timestamp, VerificationMode mode);
+    event JobCompleted(address freelancer, uint256 timestamp, VerificationMode mode);
+    event JobCancelled(address client, uint256 timestamp);
+    event RepoVerified(string indexed pullRequestUrl, uint256 timestamp);
+    event FreelancerPaid(address freelancer, uint256 amount, uint256 timestamp);
+    event ClientRefunded(address client, uint256 amount, uint256 timestamp);
+    event DisputeResolved(address arbiter, bool decision, uint256 timestamp, address winner);
+    event JobCreated(
+        uint256 indexed index,
+        address indexed client,
+        uint256 bounty,
+        string title,
+        string tags,
+        VerificationMode verificationMode,
+        address escrowAddress,
+        uint256 postedTime,
+        string IPFSHash
+    );
 
     // STATE VARIABLES
     address public client;
@@ -109,6 +127,7 @@ contract GigEscrow {
         tags = _tags;
         verificationMode = _mode;
         deployTime = block.timestamp;
+        emit JobCreated(0, _client, msg.value, _title, _tags, _mode, address(this), block.timestamp, _IPFSHash);
     }
 
     function applyForJob() external {
@@ -119,12 +138,14 @@ contract GigEscrow {
         hasApplied[msg.sender] = true;
         applicants.push(Applicant({ applicant: msg.sender, timestamp: block.timestamp }));
         state = EscrowState.APPLIED;
+        emit ApplicationRecieved(client, msg.sender, block.timestamp);
     }
 
     function hireFreelancer(address _dev) external onlyClient inState(EscrowState.APPLIED) {
         freelancer = _dev;
         if (!hasApplied[_dev]) revert InvalidTransactionSender();
         state = EscrowState.LOCKED;
+        emit FreelancerHired(client, freelancer, block.timestamp);
     }
 
     function verifyGithub(string calldata pullRequestUrl) internal inState(EscrowState.IN_REVIEW) {
@@ -133,6 +154,8 @@ contract GigEscrow {
             pullRequestUrl;
         }
         state = EscrowState.COMPLETED;
+        emit RepoVerified(pullRequestUrl, block.timestamp);
+        emit JobCompleted(freelancer, block.timestamp, verificationMode);
     }
 
     function submitWork(string calldata pullRequestUrl) external onlyFreelancer inState(EscrowState.LOCKED) {
@@ -154,6 +177,7 @@ contract GigEscrow {
 
     function completeJob() external onlyClient inState(EscrowState.IN_REVIEW) {
         state = EscrowState.COMPLETED;
+        emit JobCompleted(freelancer, block.timestamp, verificationMode);
     }
 
     function dispute() external onlyClient inState(EscrowState.IN_REVIEW) {
@@ -165,22 +189,26 @@ contract GigEscrow {
     function cancelJob() external onlyClient {
         if (state != EscrowState.OPEN && state != EscrowState.APPLIED) revert InvalidForContractState();
         state = EscrowState.CANCELLED;
+        emit JobCancelled(msg.sender, block.timestamp);
     }
 
     function autoRelease() external inState(EscrowState.IN_REVIEW) {
         if (block.timestamp <= autoReleaseDeadline) revert InvalidForContractState();
         state = EscrowState.COMPLETED;
+        emit JobCompleted(freelancer, block.timestamp, verificationMode);
         payFreelancer();
     }
 
     function payFreelancer() public inState(EscrowState.COMPLETED) {
         (bool success, ) = payable(freelancer).call{ value: address(this).balance }("");
         if (!success) revert PaymentFailed();
+        emit FreelancerPaid(freelancer, address(this).balance, block.timestamp);
     }
 
     function refundClient() external inState(EscrowState.CANCELLED) {
         (bool success, ) = payable(client).call{ value: address(this).balance }("");
         if (!success) revert PaymentFailed();
+        emit ClientRefunded(client, address(this).balance, block.timestamp);
     }
 
     function chargeDisputeFee() private {
@@ -192,6 +220,12 @@ contract GigEscrow {
     function resolveDispute(bool _payFreelancer) external onlyArbiter {
         state = _payFreelancer ? EscrowState.COMPLETED : EscrowState.CANCELLED;
         chargeDisputeFee();
+        emit DisputeResolved(arbiter, _payFreelancer, block.timestamp, _payFreelancer ? freelancer : client);
+        if (_payFreelancer) {
+            emit JobCompleted(freelancer, block.timestamp, verificationMode);
+            return;
+        }
+        emit JobCancelled(client, block.timestamp);
     }
 
     function getEscrowVariableState() external view returns (EscrowVariableState memory) {
