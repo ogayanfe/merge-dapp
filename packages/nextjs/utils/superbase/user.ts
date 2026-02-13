@@ -20,5 +20,5 @@ export async function updateUser(address: string, user: Partial<UserProfile>) {
 }
 
 export async function createUser(address: string, user: UserProfile) {
-  return supabase.from("Users").insert({ user, address });
+  return supabase.from("Users").insert({ ...user, address });
 }
