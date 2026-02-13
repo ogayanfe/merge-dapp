@@ -58,6 +58,7 @@
     "node": ">=20.18.3"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.95.3",
     "dayjs": "^1.11.19"
   }
 }

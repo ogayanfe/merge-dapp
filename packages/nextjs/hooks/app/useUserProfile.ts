@@ -1,46 +1,57 @@
 import { useEffect, useState } from "react";
-
-export interface UserProfile {
-  name: string;
-  bio: string;
-  skills: string[];
-  socials: {
-    github: string;
-    twitter: string;
-    telegram: string;
-  };
-}
+import { useAccount } from "wagmi";
+import { notification } from "~~/utils/scaffold-eth";
+import { UserProfile, createUser, getUser, updateUser } from "~~/utils/superbase/user";
 
 const DEFAULT_PROFILE: UserProfile = {
-  name: "",
+  display_name: "",
   bio: "",
   skills: [],
-  socials: {
-    github: "",
-    twitter: "",
-    telegram: "",
-  },
+  socials: [],
 };
 
 export const useUserProfile = (address: string | undefined) => {
   const [profile, setProfile] = useState<UserProfile>(DEFAULT_PROFILE);
+  const [exists, setExists] = useState(false);
+  const { address: connectedAddress } = useAccount();
 
   useEffect(() => {
     if (!address) return;
-    const stored = localStorage.getItem(`user-profile-${address}`);
-    if (stored) {
-      setProfile(JSON.parse(stored));
-    } else {
-      setProfile(DEFAULT_PROFILE);
-    }
+
+    (async () => {
+      const { data: Users } = await getUser(address);
+
+      if (!Users || Users?.length == 0) {
+        setExists(false);
+        return;
+      }
+
+      setExists(true);
+      setProfile(Users[0] as unknown as UserProfile);
+    })();
   }, [address]);
 
-  const updateProfile = (newProfile: Partial<UserProfile>) => {
-    if (!address) return;
-    const updated = { ...profile, ...newProfile };
-    setProfile(updated);
-    localStorage.setItem(`user-profile-${address}`, JSON.stringify(updated));
-  };
+  async function updateProfile(newProfile: Partial<UserProfile>) {
+    if (!address || !connectedAddress || address != connectedAddress) return;
 
-  return { profile, updateProfile };
+    const updated = { ...profile, ...newProfile };
+
+    const id = notification.loading("Updating profile");
+
+    try {
+      if (exists) {
+        await updateUser(address, updated);
+      } else {
+        await createUser(address, updated);
+      }
+      notification.success("Profile updated successfully");
+      setProfile(updated);
+    } catch {
+      notification.error("Error updating profile. Try refreshing page");
+    }
+
+    notification.remove(id);
+  }
+
+  return { profile, updateProfile, exists };
 };
