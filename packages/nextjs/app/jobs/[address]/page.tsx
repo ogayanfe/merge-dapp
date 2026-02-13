@@ -1,13 +1,13 @@
 "use client";
 
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { notFound, useParams } from "next/navigation";
 import { useAccount } from "wagmi";
 import { JobActionSidebar } from "~~/components/Job/JobActionSidebar";
 import { JobDetailPane } from "~~/components/Job/JobDetailPane";
-import DEMO_DATA from "~~/components/Job/data";
 import useQueryEscrowInfo from "~~/hooks/app/useQueryEscrow";
 import { IEscrowState, IJob } from "~~/types/jobs";
+import { getJob } from "~~/utils/superbase/jobs";
 
 function Loading() {
   return (
@@ -23,6 +23,8 @@ export default function JobDetailPage() {
 
   const address = params.address as string;
   const { address: connectedAddress } = useAccount();
+  const [loadingFromSupabase, setLoadingFromSupabase] = useState(false);
+  const [job, setJob] = useState<Partial<IJob>>({});
 
   const {
     data: escrowState,
@@ -31,11 +33,39 @@ export default function JobDetailPage() {
     refetch,
   } = useQueryEscrowInfo<IEscrowState>(address, "getEscrowVariableState", connectedAddress);
 
+  const status = escrowState
+    ? ["OPEN", "APPLYING", "LOCKED", "IN_REVIEW", "DISPUTED", "COMPLETED", "CANCELLED"][escrowState.state]
+    : "LOADING";
+
   const handleEvent = useCallback(() => {
     refetch();
   }, [refetch]);
 
-  if (isLoading) {
+  const _job = {
+    ...escrowState,
+    address,
+    repoUrl: "",
+    status: status as IJob["status"],
+    description: job.description ?? "",
+  };
+
+  useEffect(() => {
+    (async () => {
+      try {
+        setLoadingFromSupabase(true);
+        const { data } = await getJob(address, escrowState.client);
+        console.log(data);
+        if (!data) throw new Error("Couldn't retrieve post details");
+        setJob(p => ({ ...p, description: data.details as string }));
+      } catch (error) {
+        console.log(error);
+      }
+
+      setLoadingFromSupabase(false);
+    })();
+  }, [address, escrowState]);
+
+  if (isLoading || loadingFromSupabase) {
     return <Loading />;
   }
 
@@ -44,26 +74,13 @@ export default function JobDetailPage() {
     return null;
   }
 
-  const job: IJob = {
-    ...escrowState,
-    address,
-    status: ["OPEN", "APPLYING", "LOCKED", "IN_REVIEW", "DISPUTED", "COMPLETED", "CANCELLED"][
-      escrowState.state
-    ] as IJob["status"],
-    repoUrl: "",
-
-    // Demo Data
-    description: DEMO_DATA.description,
-    clientRep: DEMO_DATA.clientRep,
-  };
-
   return (
     <div className="flex h-full bg-base-100 font-mono text-base-content overflow-hidden">
       {/* Detail Pane */}
-      <JobDetailPane job={job} onEvent={handleEvent} />
+      <JobDetailPane job={_job} onEvent={handleEvent} />
 
       {/* Action Sidebar */}
-      <JobActionSidebar job={job} />
+      <JobActionSidebar job={_job} />
     </div>
   );
 }

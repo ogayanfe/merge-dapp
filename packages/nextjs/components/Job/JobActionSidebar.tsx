@@ -17,6 +17,8 @@ import {
 import { RainbowKitCustomConnectButton } from "~~/components/scaffold-eth";
 import useMutateEscrowContract from "~~/hooks/app/useMutateEscrow";
 import { IJob } from "~~/types/jobs";
+import { notification } from "~~/utils/scaffold-eth";
+import { createJob } from "~~/utils/superbase/jobs";
 
 interface JobActionSidebarProps {
   job: IJob;
@@ -59,10 +61,22 @@ export const JobActionSidebar = ({ job }: JobActionSidebarProps) => {
     isApplying || isResolvingToFreelancer || isResolvingToClient || isConfirming || isCancellingJob;
 
   useEffect(() => {
-    if (isConfirmed) {
-      queryClient.invalidateQueries();
-    }
-  }, [isConfirmed, queryClient]);
+    if (!isConfirmed) return;
+    queryClient.invalidateQueries();
+    if (hash !== applyHash) return;
+
+    // Track Application
+    (async () => {
+      await createJob({
+        address: connectedAddress! as `0x${string}`,
+        jobAddress: address as `0x${string}`,
+        role: "APPLICANT",
+        details: "Applied for job",
+        bounty: job.bounty.toString(),
+      });
+      notification.success("Application tracked successfully");
+    })();
+  }, [isConfirmed, queryClient, hash, applyHash, address, connectedAddress, job.bounty]);
 
   return (
     <aside className="w-96 border-l border-base-300 bg-base-200/30 flex flex-col h-full shadow-2xl">

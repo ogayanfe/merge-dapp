@@ -43,7 +43,7 @@ contract MergeFactory is Ownable {
         arbiter = _arbiter;
     }
 
-    function postJob(string calldata _title, string memory _IPFSHash, string memory tags, VerificationMode _verificationMode) external payable {
+    function postJob(string calldata _title, string memory _IPFSHash, string memory tags, VerificationMode _verificationMode) external payable returns(address) {
         if (msg.value == 0) revert InvalidAmount();
         GigEscrow newEscrow = new GigEscrow{ value: msg.value }(_title, msg.sender, arbiter, _IPFSHash, tags, _verificationMode);
 
@@ -71,6 +71,7 @@ contract MergeFactory is Ownable {
 
         jobs.push(newJob);
         escrowStates[address(newEscrow)] = newJob;
+        return address(newEscrow);
     }
 
     function getJobByEscrowAddress(address _escrowAddress) external view returns (JobMetadata memory) {

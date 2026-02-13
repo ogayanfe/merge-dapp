@@ -11,8 +11,10 @@ import { JobStep2Specifications } from "~~/components/jobs/JobStep2Specification
 import { JobStep3Capitalization } from "~~/components/jobs/JobStep3Capitalization";
 import { JobStepIndicator } from "~~/components/jobs/JobStepIndicator";
 import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
+import { useTargetNetwork } from "~~/hooks/scaffold-eth/useTargetNetwork";
+import { getJobAddressFromLogs } from "~~/utils/mergeContract";
 import { notification } from "~~/utils/scaffold-eth";
-import { addToIPFS } from "~~/utils/simpleIPFS";
+import { createJob } from "~~/utils/superbase/jobs";
 
 function validateValues(title: string, repo: string, description: string, bounty: string, balance?: bigint) {
   if (!title || !repo || !description || !bounty) {
@@ -45,6 +47,7 @@ function validateValues(title: string, repo: string, description: string, bounty
 }
 
 const CreateJobPage: NextPage = () => {
+  const { targetNetwork } = useTargetNetwork();
   const router = useRouter();
   const { address } = useAccount();
   const { data: balance } = useBalance({ address });
@@ -63,7 +66,6 @@ const CreateJobPage: NextPage = () => {
   const { writeContractAsync, isPending } = useScaffoldWriteContract({ contractName: "MergeFactory" });
   const { isSuccess: isConfirmed, isLoading: isConfirming, data } = useWaitForTransactionReceipt({ hash });
 
-  console.log(data);
   const loading = isPending || isConfirming;
 
   const handleNext = () => {
@@ -93,21 +95,11 @@ const CreateJobPage: NextPage = () => {
     validateValues(title, repo, description, bounty, balance?.value);
 
     try {
-      const ipfsHash = await addToIPFS({
-        title,
-        description,
-        repo,
-        tags,
-        protocolType,
-        timestamp: Date.now(),
-      });
-      console.log("Uploaded to IPFS:", ipfsHash);
-
       const verificationMode = protocolType === "git" ? 0 : 1;
 
       const txHash = await writeContractAsync({
         functionName: "postJob",
-        args: [title, ipfsHash, tags, verificationMode],
+        args: [title, "", tags, verificationMode],
         value: parseEther(bounty),
       });
 
@@ -121,12 +113,27 @@ const CreateJobPage: NextPage = () => {
   }
 
   useEffect(() => {
-    if (isConfirmed) {
-      notification.success("Successfully deployed job");
+    if (!isConfirmed || !data) return;
+    const newJobAddress = getJobAddressFromLogs(data.logs, targetNetwork.id);
+
+    if (!newJobAddress) {
+      notification.error("Job deployed but failed to index address");
       router.push("/jobs");
       return;
     }
-  }, [isConfirmed, router]);
+    const id = notification.loading("Loading Address Information");
+    (async () => {
+      await createJob({
+        address: address! as `0x${string}`,
+        jobAddress: newJobAddress as `0x${string}`,
+        role: "CLIENT",
+        details: description,
+        bounty: parseEther(bounty).toString(),
+      });
+      notification.remove(id);
+      router.push(`/jobs/${newJobAddress}`);
+    })();
+  }, [isConfirmed, data, router, address, description, bounty, targetNetwork]);
 
   return (
     <div className="flex h-full bg-base-100 font-mono text-base-content overflow-hidden">

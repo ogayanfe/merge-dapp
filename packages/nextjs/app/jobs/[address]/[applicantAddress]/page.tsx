@@ -10,6 +10,8 @@ import { UserStats } from "~~/components/user/UserStats";
 import useMutateEscrowContract from "~~/hooks/app/useMutateEscrow";
 import useQueryEscrowInfo from "~~/hooks/app/useQueryEscrow";
 import { IEscrowState } from "~~/types/jobs";
+import { notification } from "~~/utils/scaffold-eth";
+import { createJob } from "~~/utils/superbase/jobs";
 
 export default function ApplicantDetailPage() {
   const params = useParams();
@@ -27,7 +29,7 @@ export default function ApplicantDetailPage() {
   const applicant = escrowState?.applicants?.[index];
 
   const isClient = connectedAddress === escrowState?.client;
-  const { mutate: hire, isPending: isHiring } = useMutateEscrowContract(address, "hireFreelancer", [
+  const { mutate: _hire, isPending: isHiring } = useMutateEscrowContract(address, "hireFreelancer", [
     applicant?.applicant,
   ]);
 
@@ -38,6 +40,23 @@ export default function ApplicantDetailPage() {
       </div>
     );
   }
+
+  const hire = () => {
+    const id = notification.loading("Hiring Applicant");
+    _hire();
+    (async () => {
+      await createJob({
+        address: applicantAddress as `0x${string}`,
+        jobAddress: address as `0x${string}`,
+        role: "FREELANCER",
+        details: "Applied for job",
+        bounty: escrowState?.bounty.toString(),
+      });
+      notification.success("Application tracked successfully");
+    })();
+    notification.remove(id);
+    notification.success("Applicant Hired, Contract is now locked");
+  };
 
   if (isError || !escrowState || !applicant) {
     return (

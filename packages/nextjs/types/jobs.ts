@@ -23,7 +23,6 @@ interface IJob extends IEscrowState {
   status: "OPEN" | "APPLYING" | "LOCKED" | "IN_REVIEW" | "DISPUTED" | "COMPLETED" | "CANCELLED";
   repoUrl: string;
   description: string;
-  clientRep: number;
 }
 
 export type { IJob, IEscrowState };
