@@ -1,15 +1,14 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useAccount } from "wagmi";
 import { ArrowLeftIcon } from "@heroicons/react/24/outline";
+import { UserJobHistory } from "~~/components/user/UserJobHistory";
 import { UserProfileHeader } from "~~/components/user/UserProfileHeader";
 import { UserStats } from "~~/components/user/UserStats";
 import useQueryEscrowInfo from "~~/hooks/app/useQueryEscrow";
 import { IEscrowState } from "~~/types/jobs";
-import { getAppliedJobs, getClientJobs, getFreelanceJobs } from "~~/utils/superbase/jobs";
 
 export default function UserProfilePage() {
   const params = useParams();
@@ -22,30 +21,7 @@ export default function UserProfilePage() {
     data: escrowState,
     isLoading,
     isError,
-    refetch,
   } = useQueryEscrowInfo<IEscrowState>(address, "getEscrowVariableState", connectedAddress);
-
-  const [clientJobs, setClientJobs] = useState<any[]>([]);
-  const [appliedJobs, setAppliedJobs] = useState<any[]>([]);
-  const [hiredJobs, setHiredJobs] = useState<any[]>([]);
-
-  useEffect(() => {
-    async function loadJobs() {
-      const { data: cJobs } = await getClientJobs(address as `0x${string}`);
-      const { data: aJobs } = await getAppliedJobs(address as `0x${string}`);
-      const { data: hJobs } = await getFreelanceJobs(address as `0x${string}`);
-      if (cJobs) setClientJobs(cJobs);
-      if (aJobs) setAppliedJobs(aJobs);
-      if (hJobs) setHiredJobs(hJobs);
-    }
-    loadJobs();
-  }, [address]);
-
-  const handleEvent = useCallback(() => {
-    refetch();
-  }, [refetch]);
-
-  console.log(clientJobs, appliedJobs, hiredJobs, handleEvent);
 
   if (isLoading) {
     return (
@@ -77,6 +53,9 @@ export default function UserProfilePage() {
 
           {/* Reusable Stats Grid */}
           <UserStats address={address} />
+
+          {/* Job History */}
+          <UserJobHistory address={address} />
         </div>
       </main>
     </div>

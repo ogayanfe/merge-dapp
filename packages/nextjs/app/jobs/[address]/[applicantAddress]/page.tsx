@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useAccount } from "wagmi";
 import { ArrowLeftIcon, CheckCircleIcon } from "@heroicons/react/24/outline";
+import { UserJobHistory } from "~~/components/user/UserJobHistory";
 import { UserProfileHeader } from "~~/components/user/UserProfileHeader";
 import { UserStats } from "~~/components/user/UserStats";
 import useMutateEscrowContract from "~~/hooks/app/useMutateEscrow";
@@ -92,6 +93,9 @@ export default function ApplicantDetailPage() {
 
           {/* Reusable Stats Grid */}
           <UserStats address={applicantAddress} />
+
+          {/* Job History */}
+          <UserJobHistory address={applicantAddress} />
 
           {/* Client Actions (Hire Logic specific to this page) */}
           {isClient && (
