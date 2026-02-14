@@ -20,6 +20,7 @@ export function UserJobHistory({ address }: { address: string }) {
   const [appliedJobs, setAppliedJobs] = useState<JobRecord[]>([]);
   const [hiredJobs, setHiredJobs] = useState<JobRecord[]>([]);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState("created");
 
   useEffect(() => {
     async function loadJobs() {
@@ -57,7 +58,7 @@ export function UserJobHistory({ address }: { address: string }) {
 
   const renderJobList = (jobs: JobRecord[], title: string, emptyMsg: string) => (
     <div className="space-y-4">
-      <h3 className="text-sm font-black uppercase tracking-widest text-base-content/70 flex items-center gap-2">
+      <h3 className="hidden md:flex text-sm font-black uppercase tracking-widest text-base-content/70 items-center gap-2">
         {title}
         <span className="px-2 py-0.5 bg-base-300 text-[10px] rounded-full text-base-content/60">{jobs.length}</span>
       </h3>
@@ -99,11 +100,39 @@ export function UserJobHistory({ address }: { address: string }) {
     </div>
   );
 
+  const tabs = [
+    { id: "created", label: "Created", jobs: clientJobs, emptyMsg: "No jobs created" },
+    { id: "applied", label: "Applied", jobs: appliedJobs, emptyMsg: "No active applications" },
+    { id: "hired", label: "Hired", jobs: hiredJobs, emptyMsg: "No completed jobs" },
+  ];
+
   return (
-    <div className="grid md:grid-cols-3 gap-8 pt-8 border-t border-base-300">
-      {renderJobList(clientJobs, "Created", "No jobs created")}
-      {renderJobList(appliedJobs, "Applied", "No active applications")}
-      {renderJobList(hiredJobs, "Hired", "No completed jobs")}
+    <div className="pt-8 border-t border-base-300">
+      {/* Mobile Sticky Tabs */}
+      <div className="md:hidden sticky top-0 z-30 bg-base-100/95 backdrop-blur py-2 mb-6 border-b border-base-200 overflow-x-auto flex gap-6 scrollbar-hide">
+        {tabs.map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`pb-2 text-xs font-black uppercase tracking-widest transition-colors whitespace-nowrap relative ${
+              activeTab === tab.id ? "text-primary" : "text-base-content/40 hover:text-base-content/70"
+            }`}
+          >
+            {tab.label}
+            <span className="ml-2 text-[10px] opacity-60">{tab.jobs.length}</span>
+            {activeTab === tab.id && <span className="absolute bottom-0 left-0 w-full h-[2px] bg-primary" />}
+          </button>
+        ))}
+      </div>
+
+      {/* Grid / Tab Content */}
+      <div className="grid md:grid-cols-3 gap-8">
+        {tabs.map(tab => (
+          <div key={tab.id} className={`${activeTab === tab.id ? "block" : "hidden md:block"}`}>
+            {renderJobList(tab.jobs, tab.label, tab.emptyMsg)}
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
