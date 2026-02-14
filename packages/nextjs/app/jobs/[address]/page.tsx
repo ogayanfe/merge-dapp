@@ -87,9 +87,9 @@ export default function JobDetailPage() {
       {status !== "OPEN" &&
         status !== "APPLYING" &&
         connectedAddress &&
-        [escrowState.client, escrowState.freelancer, escrowState.arbiter].some(
-          a => a?.toLowerCase() === connectedAddress.toLowerCase(),
-        ) && <JobChat jobAddress={address} currentUser={connectedAddress} />}
+        [escrowState.client, escrowState.freelancer].some(a => a?.toLowerCase() === connectedAddress.toLowerCase()) && (
+          <JobChat jobAddress={address} currentUser={connectedAddress} />
+        )}
     </div>
   );
 }
