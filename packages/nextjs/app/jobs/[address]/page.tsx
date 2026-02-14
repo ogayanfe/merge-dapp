@@ -4,6 +4,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import { notFound, useParams } from "next/navigation";
 import { useAccount } from "wagmi";
 import { JobActionSidebar } from "~~/components/Job/JobActionSidebar";
+import { JobChat } from "~~/components/Job/JobChat";
 import { JobDetailPane } from "~~/components/Job/JobDetailPane";
 import useQueryEscrowInfo from "~~/hooks/app/useQueryEscrow";
 import { IEscrowState, IJob } from "~~/types/jobs";
@@ -81,6 +82,14 @@ export default function JobDetailPage() {
 
       {/* Action Sidebar */}
       <JobActionSidebar job={_job} />
+
+      {/* Chat Widget - Visible only to participants when job is not OPEN */}
+      {status !== "OPEN" &&
+        status !== "APPLYING" &&
+        connectedAddress &&
+        [escrowState.client, escrowState.freelancer, escrowState.arbiter].some(
+          a => a?.toLowerCase() === connectedAddress.toLowerCase(),
+        ) && <JobChat jobAddress={address} currentUser={connectedAddress} />}
     </div>
   );
 }
