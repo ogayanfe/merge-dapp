@@ -12,6 +12,7 @@ import useMutateEscrowContract from "~~/hooks/app/useMutateEscrow";
 import useQueryEscrowInfo from "~~/hooks/app/useQueryEscrow";
 import { IEscrowState } from "~~/types/jobs";
 import { notification } from "~~/utils/scaffold-eth";
+import { isZeroAddress } from "~~/utils/scaffold-eth/common";
 import { createJob } from "~~/utils/superbase/jobs";
 
 export default function ApplicantDetailPage() {
@@ -98,7 +99,7 @@ export default function ApplicantDetailPage() {
           <UserJobHistory address={applicantAddress} />
 
           {/* Client Actions (Hire Logic specific to this page) */}
-          {isClient && (
+          {isClient && isZeroAddress(escrowState.freelancer) && (
             <section className="pt-8 border-t border-base-300">
               <div className="bg-primary/5 border border-primary/20 p-8 flex items-center justify-between">
                 <div className="space-y-1">
