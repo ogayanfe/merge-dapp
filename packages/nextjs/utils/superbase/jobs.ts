@@ -11,20 +11,16 @@ export interface JobDetails {
   created_at?: string;
   address: `0x${string}`;
   jobAddress: `0x${string}`;
-  role: "CLIENT" | "FREELANCER" | "ARBITER" | "APPLICANT";
+  role: "CLIENT" | "FREELANCER" | "ARBITER" | "APPLICANT" | "DISPUTER";
   details?: string;
   bounty: string; // stored in wei
 }
 
-export async function createJob(details: JobDetails) {
+export async function createJob(details: Partial<JobDetails>) {
   return superbase.from(table).insert({ ...details });
 }
 
-export async function getJob(
-  jobAddress: string,
-  address: string,
-  role: "CLIENT" | "FREELANCER" | "ARBITER" | "APPLICANT" = "CLIENT",
-) {
+export async function getJob(jobAddress: string, address: string, role: JobDetails["role"] = "CLIENT") {
   console.log(jobAddress, address);
   return superbase
     .from(table)
@@ -32,7 +28,11 @@ export async function getJob(
     .eq("jobAddress", jobAddress)
     .eq("address", address)
     .eq("role", role)
-    .single();
+    .maybeSingle();
+}
+
+export async function getDispute(jobAddress: string) {
+  return superbase.from(table).select("*").eq("jobAddress", jobAddress).eq("role", "DISPUTER").maybeSingle();
 }
 
 export async function getClientJobs(clientAddr: `0x${string}`) {

@@ -8,7 +8,7 @@ import { JobChat } from "~~/components/Job/JobChat";
 import { JobDetailPane } from "~~/components/Job/JobDetailPane";
 import useQueryEscrowInfo from "~~/hooks/app/useQueryEscrow";
 import { IEscrowState, IJob } from "~~/types/jobs";
-import { getJob } from "~~/utils/superbase/jobs";
+import { getDispute, getJob } from "~~/utils/superbase/jobs";
 
 function Loading() {
   return (
@@ -48,16 +48,27 @@ export default function JobDetailPage() {
     repoUrl: "",
     status: status as IJob["status"],
     description: job.description ?? "",
+    disputeReason: job.disputeReason,
+    disputer: job.disputer,
   };
 
   useEffect(() => {
     (async () => {
       try {
         setLoadingFromSupabase(true);
-        const { data } = await getJob(address, escrowState.client);
-        console.log(data);
-        if (!data) throw new Error("Couldn't retrieve post details");
-        setJob(p => ({ ...p, description: data.details as string }));
+        const [jobRes, disputeRes] = await Promise.all([
+          getJob(address, escrowState.client),
+          escrowState.state === 4 ? getDispute(address) : Promise.resolve({ data: null }), // 4 is DISPUTED based on the status array index?
+        ]);
+
+        if (!jobRes.data) throw new Error("Couldn't retrieve post details");
+
+        setJob(p => ({
+          ...p,
+          description: jobRes.data.details as string,
+          disputeReason: disputeRes.data?.details || undefined,
+          disputer: disputeRes.data?.address || undefined,
+        }));
       } catch (error) {
         console.log(error);
       }

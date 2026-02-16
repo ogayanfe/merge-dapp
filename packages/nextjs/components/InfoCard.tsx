@@ -3,11 +3,22 @@ import React from "react";
 interface InfoCardProps {
   title: string;
   children: React.ReactNode;
+  variant?: "bland" | "success" | "warning" | "error";
+  className?: string;
 }
 
-export const InfoCard = ({ title, children }: InfoCardProps) => {
+export const InfoCard = ({ title, children, variant = "bland", className = "" }: InfoCardProps) => {
+  const borderColors = {
+    bland: "border-l-base-content/10",
+    success: "border-l-success",
+    warning: "border-l-warning",
+    error: "border-l-error",
+  };
+
   return (
-    <div className="bg-base-200/50 border border-base-300 p-8 shadow-sm backdrop-blur-sm relative overflow-hidden group">
+    <div
+      className={`bg-base-200/50 border border-base-300 border-l-4 p-8 shadow-sm backdrop-blur-sm relative overflow-hidden group ${borderColors[variant]}`}
+    >
       <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -25,7 +36,7 @@ export const InfoCard = ({ title, children }: InfoCardProps) => {
         </svg>
       </div>
       <h3 className="text-[10px] font-black uppercase opacity-40 mb-4 tracking-widest">{title}</h3>
-      <div className="text-sm font-mono whitespace-pre-wrap leading-relaxed opacity-80">{children}</div>
+      <div className={`text-sm font-mono whitespace-pre-wrap leading-relaxed opacity-80 ${className}`}>{children}</div>
     </div>
   );
 };

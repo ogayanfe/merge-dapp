@@ -74,6 +74,8 @@ contract GigEscrow {
     );
 
     // STATE VARIABLES
+    uint256 private bounty;
+
     address public client;
     address public freelancer;
     address public arbiter;
@@ -125,6 +127,7 @@ contract GigEscrow {
         client = _client;
         arbiter = _arbiter;
         title = _title;
+        bounty = msg.value;
         IPFSHash = _IPFSHash;
         tags = _tags;
         verificationMode = _mode;
@@ -203,15 +206,17 @@ contract GigEscrow {
     }
 
     function payFreelancer() public inState(EscrowState.COMPLETED) {
-        (bool success, ) = payable(freelancer).call{ value: address(this).balance }("");
+        uint256 paid = address(this).balance;
+        (bool success, ) = payable(freelancer).call{ value: paid }("");
         if (!success) revert PaymentFailed();
-        emit FreelancerPaid(freelancer, address(this).balance, block.timestamp);
+        emit FreelancerPaid(freelancer, paid, block.timestamp);
     }
 
     function refundClient() external inState(EscrowState.CANCELLED) {
-        (bool success, ) = payable(client).call{ value: address(this).balance }("");
+        uint256 paid = address(this).balance;
+        (bool success, ) = payable(client).call{ value: paid }("");
         if (!success) revert PaymentFailed();
-        emit ClientRefunded(client, address(this).balance, block.timestamp);
+        emit ClientRefunded(client, paid, block.timestamp);
     }
 
     function chargeDisputeFee() private {

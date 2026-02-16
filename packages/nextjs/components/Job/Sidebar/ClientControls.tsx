@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { useQueryClient } from "@tanstack/react-query";
-import { useWaitForTransactionReceipt } from "wagmi";
+import { useAccount, useWaitForTransactionReceipt } from "wagmi";
 import {
   BanknotesIcon,
   CheckCircleIcon,
@@ -9,8 +9,11 @@ import {
   ExclamationTriangleIcon,
   ShieldExclamationIcon,
 } from "@heroicons/react/24/outline";
+import { ModalInput } from "~~/components/Job/ModalInput";
 import useMutateEscrowContract from "~~/hooks/app/useMutateEscrow";
 import { IJob } from "~~/types/jobs";
+import { notification } from "~~/utils/scaffold-eth";
+import { createJob } from "~~/utils/superbase/jobs";
 
 interface ClientControlsProps {
   job: IJob;
@@ -40,11 +43,34 @@ export const ClientControls = ({ job }: ClientControlsProps) => {
 
   const isActionPending = isCompleting || isDisputing || isRefunding || isConfirming;
 
+  const { address: userAddress } = useAccount();
+  const [isDisputeModalOpen, setIsDisputeModalOpen] = useState(false);
+  const [disputeReason, setDisputeReason] = useState("");
+
   useEffect(() => {
     if (isConfirmed) {
       queryClient.invalidateQueries();
+      if (hash === disputeHash && disputeReason) {
+        (async () => {
+          await createJob({
+            address: userAddress as `0x${string}`,
+            jobAddress: address as `0x${string}`,
+            role: "DISPUTER",
+            details: disputeReason,
+            bounty: job.bounty.toString(),
+          });
+          notification.success("Dispute reason tracked successfully");
+          setDisputeReason(""); // Reset reason after tracking
+        })();
+      }
     }
-  }, [isConfirmed, queryClient]);
+  }, [isConfirmed, queryClient, hash, disputeHash, disputeReason, address, userAddress, job.bounty]);
+
+  const handleDispute = (reason: string) => {
+    setDisputeReason(reason);
+    dispute();
+    setIsDisputeModalOpen(false);
+  };
 
   // Timer for Auto-Release
   const [timeLeft, setTimeLeft] = useState<string | null>(null);
@@ -94,7 +120,7 @@ export const ClientControls = ({ job }: ClientControlsProps) => {
 
         <div className="relative group">
           <button
-            onClick={() => dispute()}
+            onClick={() => setIsDisputeModalOpen(true)}
             disabled={isActionPending}
             className="w-full py-4 bg-warning/10 text-warning border border-warning/20 font-black uppercase text-xs hover:bg-warning/20 transition-all flex items-center justify-center gap-2"
           >
@@ -109,6 +135,14 @@ export const ClientControls = ({ job }: ClientControlsProps) => {
             Warning: 1% fee deducted from disputed amount.
           </div>
         </div>
+        <ModalInput
+          isOpen={isDisputeModalOpen}
+          onClose={() => setIsDisputeModalOpen(false)}
+          onSubmit={handleDispute}
+          title="Resolve Dispute"
+          label="Provide reason/evidence for dispute"
+          placeholder="Describe the issue with the work submitted..."
+        />
       </div>
     );
   }

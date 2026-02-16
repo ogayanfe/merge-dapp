@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { JobApplicantsTab } from "./DetailPane/JobApplicantsTab";
 import { JobDetailsTab } from "./DetailPane/JobDetailsTab";
+import { JobDisputeTab } from "./DetailPane/JobDisputeTab";
 import { JobEventsTab } from "./DetailPane/JobEventsTab";
 import { JobHeader } from "./DetailPane/JobHeader";
-import { ClockIcon, DocumentTextIcon, UserIcon } from "@heroicons/react/24/outline";
+import { ClockIcon, DocumentTextIcon, ExclamationTriangleIcon, UserIcon } from "@heroicons/react/24/outline";
 import { IJob } from "~~/types/jobs";
 
 interface JobDetailPaneProps {
@@ -11,10 +12,10 @@ interface JobDetailPaneProps {
   onEvent?: () => void;
 }
 
-type TabType = "details" | "applicants" | "events";
+type TabType = "details" | "applicants" | "events" | "dispute";
 
 export const JobDetailPane = ({ job, onEvent }: JobDetailPaneProps) => {
-  const [activeTab, setActiveTab] = useState<TabType>("details");
+  const [activeTab, setActiveTab] = useState<TabType>(job.status === "DISPUTED" ? "dispute" : "details");
 
   return (
     <main className="flex-1 overflow-y-auto p-12 bg-grid-pattern bg-[size:40px_40px] bg-fixed opacity-[0.98]">
@@ -67,6 +68,22 @@ export const JobDetailPane = ({ job, onEvent }: JobDetailPaneProps) => {
               <span className="ml-1 bg-base-300 text-[9px] px-1.5 py-0.5 rounded-full opacity-60">{"-"}</span>
             </div>
           </button>
+
+          {job.disputeReason && (
+            <button
+              onClick={() => setActiveTab("dispute")}
+              className={`pb-4 text-xs font-black uppercase tracking-widest transition-all border-b-2 ${
+                activeTab === "dispute"
+                  ? "border-warning text-warning"
+                  : "border-transparent text-gray-400 hover:text-warning"
+              }`}
+            >
+              <div className="flex items-center gap-2 animate-pulse">
+                <ExclamationTriangleIcon className="h-4 w-4" />
+                Dispute Active
+              </div>
+            </button>
+          )}
         </div>
 
         {/* Tab Content */}
@@ -74,6 +91,7 @@ export const JobDetailPane = ({ job, onEvent }: JobDetailPaneProps) => {
           {activeTab === "details" && <JobDetailsTab job={job} />}
           {activeTab === "applicants" && <JobApplicantsTab job={job} />}
           {activeTab === "events" && <JobEventsTab job={job} onEvent={onEvent} />}
+          {activeTab === "dispute" && <JobDisputeTab job={job} />}
         </div>
       </div>
     </main>
