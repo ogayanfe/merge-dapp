@@ -31,14 +31,6 @@ export const LandingFooter = () => {
                   Post a Job
                 </Link>
               </li>
-              <li>
-                <Link
-                  href="/leaderboard"
-                  className="text-sm font-mono hover:text-primary transition-colors uppercase transition-colors"
-                >
-                  Leaderboard
-                </Link>
-              </li>
             </ul>
           </div>
 
@@ -51,14 +43,24 @@ export const LandingFooter = () => {
                 </Link>
               </li>
               <li>
-                <Link href="/github" className="text-sm font-mono hover:text-primary transition-colors uppercase">
+                <a
+                  href="https://github.com/ogayanfe/merge-dapp"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-sm font-mono hover:text-primary transition-colors uppercase"
+                >
                   GitHub
-                </Link>
+                </a>
               </li>
               <li>
-                <Link href="/security" className="text-sm font-mono hover:text-primary transition-colors uppercase">
-                  Audit Repo
-                </Link>
+                <a
+                  href="https://github.com/ogayanfe/merge-dapp?tab=MIT-1-ov-file"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-sm font-mono hover:text-primary transition-colors uppercase"
+                >
+                  License
+                </a>
               </li>
             </ul>
           </div>
@@ -73,9 +75,14 @@ export const LandingFooter = () => {
               <div className="w-8 h-8 rounded-sm bg-base-300 flex items-center justify-center font-mono text-[10px] opacity-50 hover:opacity-100 cursor-pointer">
                 DC
               </div>
-              <div className="w-8 h-8 rounded-sm bg-base-300 flex items-center justify-center font-mono text-[10px] opacity-50 hover:opacity-100 cursor-pointer">
+              <a
+                href="https://github.com/ogayanfe/merge-dapp"
+                target="_blank"
+                rel="noreferrer"
+                className="w-8 h-8 rounded-sm bg-base-300 flex items-center justify-center font-mono text-[10px] opacity-50 hover:opacity-100 cursor-pointer"
+              >
                 GH
-              </div>
+              </a>
             </div>
           </div>
         </div>
