@@ -21,7 +21,6 @@ export async function createJob(details: Partial<JobDetails>) {
 }
 
 export async function getJob(jobAddress: string, address: string, role: JobDetails["role"] = "CLIENT") {
-  console.log(jobAddress, address);
   return superbase
     .from(table)
     .select("*")
@@ -49,4 +48,7 @@ export async function getFreelanceJobs(addr: `0x${string}`) {
 
 export async function getArbiterJobs(addr: `0x${string}`) {
   return superbase.from(table).select("*").eq("address", addr).eq("role", "ARBITER");
+}
+export async function getDisputedJobs() {
+  return await superbase.from("UserJobs").select("jobAddress, details, address").eq("role", "DISPUTER");
 }

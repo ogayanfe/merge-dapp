@@ -5,9 +5,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { hardhat } from "viem/chains";
-import { Bars3Icon, BugAntIcon } from "@heroicons/react/24/outline";
+import { useAccount, useReadContract } from "wagmi";
+import { Bars3Icon, DocumentTextIcon, ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import { FaucetButton, RainbowKitCustomConnectButton } from "~~/components/scaffold-eth";
-import { useOutsideClick, useTargetNetwork } from "~~/hooks/scaffold-eth";
+import { useDeployedContractInfo, useOutsideClick, useTargetNetwork } from "~~/hooks/scaffold-eth";
 
 type HeaderMenuLink = {
   label: string;
@@ -21,14 +22,26 @@ export const menuLinks: HeaderMenuLink[] = [
     href: "/",
   },
   {
-    label: "Debug Contracts",
-    href: "/debug",
-    icon: <BugAntIcon className="h-4 w-4" />,
+    label: "Docs",
+    href: "/docs",
+    icon: <DocumentTextIcon className="h-4 w-4" />,
   },
 ];
 
 export const HeaderMenuLinks = () => {
   const pathname = usePathname();
+  const { address } = useAccount();
+
+  const { data: mergeFactory } = useDeployedContractInfo("MergeFactory");
+
+  const { data: arbiter } = useReadContract({
+    address: mergeFactory?.address,
+    abi: mergeFactory?.abi,
+    functionName: "arbiter",
+  });
+
+  const isArbiter = address && arbiter && address === arbiter;
+  console.log(isArbiter);
 
   return (
     <>
@@ -49,6 +62,20 @@ export const HeaderMenuLinks = () => {
           </li>
         );
       })}
+      {isArbiter && (
+        <li>
+          <Link
+            href="/arbiter"
+            passHref
+            className={`${
+              pathname === "/arbiter" ? "bg-error text-error-content shadow-md" : "text-error"
+            } hover:bg-error hover:text-error-content hover:shadow-md focus:!bg-error active:!text-neutral py-1.5 px-3 text-sm rounded-full gap-2 grid grid-flow-col border border-error/20`}
+          >
+            <ExclamationTriangleIcon className="h-4 w-4" />
+            <span>Disputed Jobs</span>
+          </Link>
+        </li>
+      )}
     </>
   );
 };

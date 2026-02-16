@@ -80,7 +80,7 @@ export const JobDetailPane = ({ job, onEvent }: JobDetailPaneProps) => {
             >
               <div className="flex items-center gap-2 animate-pulse">
                 <ExclamationTriangleIcon className="h-4 w-4" />
-                Dispute Active
+                Dispute Info
               </div>
             </button>
           )}

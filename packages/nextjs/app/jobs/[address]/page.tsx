@@ -56,10 +56,8 @@ export default function JobDetailPage() {
     (async () => {
       try {
         setLoadingFromSupabase(true);
-        const [jobRes, disputeRes] = await Promise.all([
-          getJob(address, escrowState.client),
-          escrowState.state === 4 ? getDispute(address) : Promise.resolve({ data: null }), // 4 is DISPUTED based on the status array index?
-        ]);
+        const [jobRes, disputeRes] = await Promise.all([getJob(address, escrowState.client), getDispute(address)]);
+        console.log(disputeRes.data);
 
         if (!jobRes.data) throw new Error("Couldn't retrieve post details");
 

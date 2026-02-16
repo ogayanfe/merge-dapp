@@ -4,19 +4,44 @@ import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ThemeModeToggle } from "./ThemeModeToggle";
-import { useAccount } from "wagmi";
-import { ChartBarIcon, PlusIcon, Squares2X2Icon, UserCircleIcon } from "@heroicons/react/24/outline";
+import { useAccount, useReadContract } from "wagmi";
+import {
+  DocumentTextIcon,
+  ExclamationTriangleIcon,
+  PlusIcon,
+  Squares2X2Icon,
+  UserCircleIcon,
+} from "@heroicons/react/24/outline";
 import { RainbowKitCustomConnectButton } from "~~/components/scaffold-eth";
+import { useDeployedContractInfo } from "~~/hooks/scaffold-eth";
 
 export const DashboardHeader = () => {
   const pathname = usePathname();
   const { address } = useAccount();
 
-  const navItems = [
-    { label: "Overview", href: "/jobs", icon: Squares2X2Icon },
-    { label: "Post Job", href: "/jobs/new", icon: PlusIcon },
-    { label: "Stats", href: "/leaderboard", icon: ChartBarIcon },
-  ];
+  const { data: mergeFactory } = useDeployedContractInfo("MergeFactory");
+  const { data: arbiter } = useReadContract({
+    address: mergeFactory?.address,
+    abi: mergeFactory?.abi,
+    functionName: "arbiter",
+  });
+
+  const isArbiter = address && arbiter && address === arbiter;
+
+  const navItems = [];
+
+  if (isArbiter) {
+    navItems.push({ label: "Disputed Jobs", href: "/arbiter", icon: ExclamationTriangleIcon });
+  }
+
+  navItems.push({ label: "Overview", href: "/jobs", icon: Squares2X2Icon });
+
+  if (!isArbiter) {
+    navItems.push({ label: "Post Job", href: "/jobs/new", icon: PlusIcon });
+  }
+
+  // Replace Stats with Docs
+  navItems.push({ label: "Docs", href: "/docs", icon: DocumentTextIcon });
 
   if (address) {
     navItems.push({ label: "My Profile", href: `/user/${address}`, icon: UserCircleIcon });

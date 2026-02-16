@@ -1,8 +1,9 @@
 import React, { useState } from "react";
 import Link from "next/link";
-import { useAccount } from "wagmi";
-import { PlusIcon } from "@heroicons/react/24/outline";
+import { useAccount, useReadContract } from "wagmi";
+import { ExclamationTriangleIcon, PlusIcon } from "@heroicons/react/24/outline";
 import { useUserStats } from "~~/hooks/app/useUserStats";
+import { useDeployedContractInfo } from "~~/hooks/scaffold-eth";
 
 interface JobSidebarProps {
   activeTab: "feed" | "active";
@@ -19,6 +20,16 @@ export const JobSidebar = ({ activeTab, setActiveTab, jobsCount, selectedTags, t
   const [tagInput, setTagInput] = useState("");
   const { address } = useAccount();
   const { stats } = useUserStats(address);
+
+  const { data: mergeFactory } = useDeployedContractInfo("MergeFactory");
+
+  const { data: arbiter } = useReadContract({
+    address: mergeFactory?.address,
+    abi: mergeFactory?.abi,
+    functionName: "arbiter",
+  });
+
+  const isArbiter = (address && arbiter && address === arbiter) as boolean;
 
   const handleAddTag = (e: React.FormEvent) => {
     e.preventDefault();
@@ -44,9 +55,16 @@ export const JobSidebar = ({ activeTab, setActiveTab, jobsCount, selectedTags, t
   return (
     <aside className="w-80 border-r border-base-300 flex flex-col h-full bg-base-200/30 shadow-inner block">
       <div className="p-6 border-b border-base-300">
-        <h2 className="text-xs font-black uppercase tracking-[0.2em] opacity-40 mb-6 text-primary italic">
+        <h2 className="text-xs font-black uppercase tracking-[0.2em] opacity-40 mb-2 text-primary italic">
           Control Panel
         </h2>
+        {isArbiter && (
+          <div className="mb-4 bg-error/10 border border-error/20 p-2 rounded-sm text-center">
+            <span className="text-[10px] font-black uppercase text-error tracking-widest block">
+              Arbiter Mode Active
+            </span>
+          </div>
+        )}
 
         <div className="space-y-4">
           <button
@@ -135,12 +153,21 @@ export const JobSidebar = ({ activeTab, setActiveTab, jobsCount, selectedTags, t
 
       {/* Action Bottom */}
       <div className="p-6 border-t border-base-300 bg-base-100">
-        <Link
-          href="/jobs/new"
-          className="w-full flex items-center justify-center gap-2 py-4 bg-primary text-primary-content font-black uppercase text-xs hover:bg-primary/90 transition-all shadow-brand-glow"
-        >
-          [ POST NEW GIG ]
-        </Link>
+        {isArbiter ? (
+          <Link
+            href="/arbiter"
+            className="w-full flex items-center justify-center gap-2 py-4 bg-error text-error-content font-black uppercase text-xs hover:bg-error/90 transition-all shadow-brand-glow"
+          >
+            <ExclamationTriangleIcon className="h-4 w-4" />[ VIEW DISPUTED JOBS ]
+          </Link>
+        ) : (
+          <Link
+            href="/jobs/new"
+            className="w-full flex items-center justify-center gap-2 py-4 bg-primary text-primary-content font-black uppercase text-xs hover:bg-primary/90 transition-all shadow-brand-glow"
+          >
+            [ POST NEW GIG ]
+          </Link>
+        )}
       </div>
     </aside>
   );

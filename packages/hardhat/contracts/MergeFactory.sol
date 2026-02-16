@@ -22,7 +22,7 @@ contract MergeFactory is Ownable {
     error InvalidAmount();
 
     // STATE VARIABLES
-    address arbiter;
+    address public arbiter;
     JobMetadata[] public jobs;
     mapping(address => JobMetadata) public escrowStates;
 
@@ -43,7 +43,12 @@ contract MergeFactory is Ownable {
         arbiter = _arbiter;
     }
 
-    function postJob(string calldata _title, string memory _IPFSHash, string memory tags, VerificationMode _verificationMode) external payable returns(address) {
+    function postJob(
+        string calldata _title,
+        string memory _IPFSHash,
+        string memory tags,
+        VerificationMode _verificationMode
+    ) external payable returns (address) {
         if (msg.value == 0) revert InvalidAmount();
         GigEscrow newEscrow = new GigEscrow{ value: msg.value }(_title, msg.sender, arbiter, _IPFSHash, tags, _verificationMode);
 
