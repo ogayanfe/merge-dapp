@@ -84,12 +84,23 @@ export default function JobDetailPage() {
       <JobActionSidebar job={_job} />
 
       {/* Chat Widget - Visible only to participants when job is not OPEN */}
-      {status !== "OPEN" &&
-        status !== "APPLYING" &&
-        connectedAddress &&
-        [escrowState.client, escrowState.freelancer].some(a => a?.toLowerCase() === connectedAddress.toLowerCase()) && (
-          <JobChat jobAddress={address} currentUser={connectedAddress} />
-        )}
+      {/* Chat Widget - Visible only to participants when job is not OPEN/APPLYING */}
+      {(() => {
+        const isClient = connectedAddress?.toLowerCase() === escrowState.client?.toLowerCase();
+        const isFreelancer = connectedAddress?.toLowerCase() === escrowState.freelancer?.toLowerCase();
+        const peerAddress = isClient ? escrowState.freelancer : isFreelancer ? escrowState.client : undefined;
+
+        if (
+          status !== "OPEN" &&
+          status !== "APPLYING" &&
+          connectedAddress &&
+          peerAddress &&
+          (isClient || isFreelancer)
+        ) {
+          return <JobChat jobAddress={address} currentUser={connectedAddress} peerAddress={peerAddress} />;
+        }
+        return null;
+      })()}
     </div>
   );
 }
