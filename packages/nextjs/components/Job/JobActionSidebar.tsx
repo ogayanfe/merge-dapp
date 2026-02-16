@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { ClientControls } from "./Sidebar/ClientControls";
 import { FreelancerControls } from "./Sidebar/FreelancerControls";
@@ -14,6 +14,7 @@ import {
   UserCircleIcon,
   XCircleIcon,
 } from "@heroicons/react/24/outline";
+import { ModalInput } from "~~/components/Job/ModalInput";
 import { RainbowKitCustomConnectButton } from "~~/components/scaffold-eth";
 import useMutateEscrowContract from "~~/hooks/app/useMutateEscrow";
 import { IJob } from "~~/types/jobs";
@@ -32,6 +33,9 @@ export const JobActionSidebar = ({ job }: JobActionSidebarProps) => {
   const isClient = job.isClient;
   const isFreelancer = connectedAddress === job.freelancer;
   const isArbiter = job.isArbiter;
+
+  const [isApplyingModalOpen, setIsApplyingModalOpen] = useState(false);
+  const [proposal, setProposal] = useState("");
 
   // Keep Arbiter/Shared apply logic here for now (or move to separate components if needed)
   const { mutate: apply, isPending: isApplying, hash: applyHash } = useMutateEscrowContract(address, "applyForJob");
@@ -71,12 +75,18 @@ export const JobActionSidebar = ({ job }: JobActionSidebarProps) => {
         address: connectedAddress! as `0x${string}`,
         jobAddress: address as `0x${string}`,
         role: "APPLICANT",
-        details: "Applied for job",
+        details: proposal || "Applied for job",
         bounty: job.bounty.toString(),
       });
       notification.success("Application tracked successfully");
     })();
-  }, [isConfirmed, queryClient, hash, applyHash, address, connectedAddress, job.bounty]);
+  }, [isConfirmed, queryClient, hash, applyHash, address, connectedAddress, job.bounty, proposal]);
+
+  const handleApply = (text: string) => {
+    setProposal(text);
+    apply();
+    setIsApplyingModalOpen(false);
+  };
 
   return (
     <aside className="w-96 border-l border-base-300 bg-base-200/30 flex flex-col h-full shadow-2xl">
@@ -160,37 +170,47 @@ export const JobActionSidebar = ({ job }: JobActionSidebarProps) => {
                 <p className="text-[10px] text-center opacity-40 uppercase">Connect wallet to apply</p>
               </div>
             ) : (
-              <button
-                onClick={() => apply()}
-                disabled={job.applied || isActionPending || !job.canApply}
-                className={`w-full py-4 flex items-center justify-center gap-3 font-black uppercase text-sm transition-all shadow-xl
-                                    ${
-                                      (job.status === "OPEN" || job.status === "APPLYING") &&
-                                      job.canApply &&
-                                      !job.applied
-                                        ? "bg-primary text-primary-content hover:shadow-brand-glow scale-100 hover:scale-[1.02]"
-                                        : "bg-base-200 text-base-content/20 border border-base-300 cursor-not-allowed"
-                                    }
-                                `}
-              >
-                {isApplying ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-white/20 border-t-white animate-spin rounded-full"></div>
-                    Processing...
-                  </>
-                ) : (
-                  <>
-                    <ShieldCheckIcon className="h-5 w-5" />
-                    {job.status == "CANCELLED"
-                      ? "JOB CANCELLED"
-                      : job.applied
-                        ? "Already Applied"
-                        : job.canApply
-                          ? "Apply For Job"
-                          : "Cannot Apply"}
-                  </>
-                )}
-              </button>
+              <>
+                <button
+                  onClick={() => setIsApplyingModalOpen(true)}
+                  disabled={job.applied || isActionPending || !job.canApply}
+                  className={`w-full py-4 flex items-center justify-center gap-3 font-black uppercase text-sm transition-all shadow-xl
+                                      ${
+                                        (job.status === "OPEN" || job.status === "APPLYING") &&
+                                        job.canApply &&
+                                        !job.applied
+                                          ? "bg-primary text-primary-content hover:shadow-brand-glow scale-100 hover:scale-[1.02]"
+                                          : "bg-base-200 text-base-content/20 border border-base-300 cursor-not-allowed"
+                                      }
+                                  `}
+                >
+                  {isApplying ? (
+                    <>
+                      <div className="w-4 h-4 border-2 border-white/20 border-t-white animate-spin rounded-full"></div>
+                      Processing...
+                    </>
+                  ) : (
+                    <>
+                      <ShieldCheckIcon className="h-5 w-5" />
+                      {job.status == "CANCELLED"
+                        ? "JOB CANCELLED"
+                        : job.applied
+                          ? "Already Applied"
+                          : job.canApply
+                            ? "Apply For Job"
+                            : "Cannot Apply"}
+                    </>
+                  )}
+                </button>
+                <ModalInput
+                  isOpen={isApplyingModalOpen}
+                  onClose={() => setIsApplyingModalOpen(false)}
+                  onSubmit={handleApply}
+                  title="Apply for Job"
+                  label="Submit a Proposal (Why are you the best fit?)"
+                  placeholder="Write your proposal here..."
+                />
+              </>
             )}
           </div>
         )}

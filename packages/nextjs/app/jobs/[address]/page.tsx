@@ -75,6 +75,10 @@ export default function JobDetailPage() {
     return null;
   }
 
+  const isClient = connectedAddress?.toLowerCase() === escrowState.client?.toLowerCase();
+  const isFreelancer = connectedAddress?.toLowerCase() === escrowState.freelancer?.toLowerCase();
+  const peerAddress = isClient ? escrowState.freelancer : isFreelancer ? escrowState.client : undefined;
+
   return (
     <div className="flex h-full bg-base-100 font-mono text-base-content overflow-hidden">
       {/* Detail Pane */}
@@ -86,10 +90,6 @@ export default function JobDetailPage() {
       {/* Chat Widget - Visible only to participants when job is not OPEN */}
       {/* Chat Widget - Visible only to participants when job is not OPEN/APPLYING */}
       {(() => {
-        const isClient = connectedAddress?.toLowerCase() === escrowState.client?.toLowerCase();
-        const isFreelancer = connectedAddress?.toLowerCase() === escrowState.freelancer?.toLowerCase();
-        const peerAddress = isClient ? escrowState.freelancer : isFreelancer ? escrowState.client : undefined;
-
         if (
           status !== "OPEN" &&
           status !== "APPLYING" &&

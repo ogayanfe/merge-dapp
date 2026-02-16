@@ -1,10 +1,11 @@
 "use client";
 
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
 import { useAccount } from "wagmi";
 import { ArrowLeftIcon, CheckCircleIcon } from "@heroicons/react/24/outline";
+import { InfoCard } from "~~/components/InfoCard";
 import { UserJobHistory } from "~~/components/user/UserJobHistory";
 import { UserProfileHeader } from "~~/components/user/UserProfileHeader";
 import { UserStats } from "~~/components/user/UserStats";
@@ -13,7 +14,7 @@ import useQueryEscrowInfo from "~~/hooks/app/useQueryEscrow";
 import { IEscrowState } from "~~/types/jobs";
 import { notification } from "~~/utils/scaffold-eth";
 import { isZeroAddress } from "~~/utils/scaffold-eth/common";
-import { createJob } from "~~/utils/superbase/jobs";
+import { createJob, getJob } from "~~/utils/superbase/jobs";
 
 export default function ApplicantDetailPage() {
   const params = useParams();
@@ -34,6 +35,18 @@ export default function ApplicantDetailPage() {
   const { mutate: _hire, isPending: isHiring } = useMutateEscrowContract(address, "hireFreelancer", [
     applicant?.applicant,
   ]);
+
+  const [proposal, setProposal] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchProposal = async () => {
+      const { data } = await getJob(address, applicantAddress, "APPLICANT");
+      if (data?.details) {
+        setProposal(data.details);
+      }
+    };
+    fetchProposal();
+  }, [address, applicantAddress]);
 
   if (isLoading) {
     return (
@@ -94,7 +107,7 @@ export default function ApplicantDetailPage() {
 
           {/* Reusable Stats Grid */}
           <UserStats address={applicantAddress} />
-
+          {proposal && <InfoCard title="Applicant Proposal">{proposal}</InfoCard>}
           {/* Job History */}
           <UserJobHistory address={applicantAddress} />
 

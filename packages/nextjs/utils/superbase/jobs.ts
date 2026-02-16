@@ -20,14 +20,18 @@ export async function createJob(details: JobDetails) {
   return superbase.from(table).insert({ ...details });
 }
 
-export async function getJob(jobAddress: string, address: string) {
+export async function getJob(
+  jobAddress: string,
+  address: string,
+  role: "CLIENT" | "FREELANCER" | "ARBITER" | "APPLICANT" = "CLIENT",
+) {
   console.log(jobAddress, address);
   return superbase
     .from(table)
     .select("*")
     .eq("jobAddress", jobAddress)
     .eq("address", address)
-    .eq("role", "CLIENT")
+    .eq("role", role)
     .single();
 }
 
