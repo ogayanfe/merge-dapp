@@ -16,6 +16,7 @@ interface IEscrowState {
   applied: boolean;
   isClient: boolean;
   isArbiter: boolean;
+  pullRequestUrl: string;
 }
 
 interface IJob extends IEscrowState {

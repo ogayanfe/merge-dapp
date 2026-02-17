@@ -38,6 +38,7 @@ struct EscrowVariableState {
     bool canApply;
     bool isClient;
     bool isArbiter;
+    string pullRequestUrl;
 }
 
 contract GigEscrow {
@@ -77,19 +78,20 @@ contract GigEscrow {
     // STATE VARIABLES
     uint256 private bounty;
 
-    address public client;
-    address public freelancer;
-    address public arbiter;
-    string public IPFSHash;
-    string public title;
-    string public tags;
+    address client;
+    address freelancer;
+    address arbiter;
+    string IPFSHash;
+    string title;
+    string tags;
     uint256 public deployTime;
     uint256 public deployBlock;
     Applicant[] public applicants;
-    mapping(address => bool) public hasApplied;
-    EscrowState public state;
+    mapping(address => bool) hasApplied;
+    EscrowState state;
     uint256 autoReleaseDeadline;
-    VerificationMode public verificationMode;
+    VerificationMode verificationMode;
+    string pullRequestUrl;
 
     // CONSTANTS
     uint256 public constant reviewWindow = 1 weeks;
@@ -155,31 +157,16 @@ contract GigEscrow {
         emit FreelancerHired(client, freelancer, block.timestamp);
     }
 
-    function verifyGithub(string calldata pullRequestUrl) internal inState(EscrowState.IN_REVIEW) {
-        {
-            // Here we add logic to verify using chain link
-            pullRequestUrl;
-        }
-        state = EscrowState.COMPLETED;
-        emit RepoVerified(pullRequestUrl, block.timestamp);
-        emit JobCompleted(freelancer, block.timestamp, verificationMode);
-    }
-
-    function submitWork(string calldata pullRequestUrl) external onlyFreelancer inState(EscrowState.LOCKED) {
+    function submitWork(string calldata _pullRequestUrl) external onlyFreelancer inState(EscrowState.LOCKED) {
         state = EscrowState.IN_REVIEW;
         autoReleaseDeadline = block.timestamp + reviewWindow;
+        pullRequestUrl = _pullRequestUrl;
 
-        if (verificationMode == VerificationMode.ManualValidation) {
-            emit JobSubmitted(freelancer, block.timestamp, verificationMode);
-            return;
-        }
-
-        if (bytes(pullRequestUrl).length == 0) {
+        if (bytes(_pullRequestUrl).length == 0 && verificationMode == VerificationMode.RepoValidation) {
             revert InvalidPullRequestUrl();
         }
 
         emit JobSubmitted(freelancer, block.timestamp, verificationMode);
-        verifyGithub(pullRequestUrl);
     }
 
     function completeJob() external onlyClient inState(EscrowState.IN_REVIEW) {
@@ -260,7 +247,8 @@ contract GigEscrow {
                     client != msg.sender &&
                     arbiter != msg.sender,
                 isClient: client == msg.sender,
-                isArbiter: arbiter == msg.sender
+                isArbiter: arbiter == msg.sender,
+                pullRequestUrl: pullRequestUrl
             });
     }
 }

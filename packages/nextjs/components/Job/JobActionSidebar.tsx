@@ -104,7 +104,7 @@ export const JobActionSidebar = ({ job }: JobActionSidebarProps) => {
             </div>
           </div>
           <div className="text-right">
-            <span className="text-[10px] uppercase opacity-40 block font-black mb-1">Reward</span>
+            <span className="text-[10px] uppercase opacity-40 block font-black mb-1">Contract Balance</span>
             <span className="text-3xl font-black text-primary italic tracking-tight">
               {formatEther(job.bounty)} ETH
             </span>

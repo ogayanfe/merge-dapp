@@ -5,6 +5,7 @@ import { useWaitForTransactionReceipt } from "wagmi";
 import { BanknotesIcon, CheckCircleIcon, CodeBracketIcon } from "@heroicons/react/24/outline";
 import useMutateEscrowContract from "~~/hooks/app/useMutateEscrow";
 import { IJob } from "~~/types/jobs";
+import { validatePrAgainstRepo } from "~~/utils/github";
 
 interface FreelancerControlsProps {
   job: IJob;
@@ -49,16 +50,31 @@ export const FreelancerControls = ({ job }: FreelancerControlsProps) => {
             <input
               type="text"
               value={prUrl}
-              onChange={e => setPrUrl(e.target.value)}
+              onChange={e => {
+                setPrUrl(e.target.value);
+                // Basic validation on change could be added, or assume user submits valid URL
+              }}
               placeholder="https://github.com/..."
               className="w-full bg-base-100 border border-base-300 p-3 text-xs font-mono focus:outline-none focus:border-primary"
             />
+            {prUrl && job.repoUrl && !validatePrAgainstRepo(prUrl, job.repoUrl) && (
+              <span className="text-[10px] text-error font-bold">
+                {"⚠️ PR must be from the job's repository:"} {job.repoUrl}
+              </span>
+            )}
+            {prUrl && !prUrl.includes("/pull/") && (
+              <span className="text-[10px] text-error font-bold">⚠️ Must be a valid Pull Request URL</span>
+            )}
           </div>
         )}
 
         <button
           onClick={() => submitWork()}
-          disabled={isActionPending || (job.verificationMode === 0 && !prUrl)}
+          disabled={
+            isActionPending ||
+            (job.verificationMode === 0 &&
+              (!prUrl || !validatePrAgainstRepo(prUrl, job.repoUrl) || !prUrl.includes("/pull/")))
+          }
           className="w-full py-4 bg-primary text-primary-content font-black uppercase text-xs hover:bg-primary/90 transition-all shadow-brand-glow flex items-center justify-center gap-2"
         >
           {isSubmitting ? (

@@ -12,21 +12,36 @@ import { JobStep3Capitalization } from "~~/components/jobs/JobStep3Capitalizatio
 import { JobStepIndicator } from "~~/components/jobs/JobStepIndicator";
 import { useScaffoldWriteContract } from "~~/hooks/scaffold-eth";
 import { useTargetNetwork } from "~~/hooks/scaffold-eth/useTargetNetwork";
+import { parseGithubUrl } from "~~/utils/github";
 import { getJobAddressFromLogs } from "~~/utils/mergeContract";
 import { notification } from "~~/utils/scaffold-eth";
 import { createJob } from "~~/utils/superbase/jobs";
 
-function validateValues(title: string, repo: string, description: string, bounty: string, balance?: bigint) {
-  if (!title || !repo || !description || !bounty) {
+function validateValues(
+  title: string,
+  repo: string,
+  description: string,
+  bounty: string,
+  protocolType: "git" | "manual",
+  balance?: bigint,
+) {
+  // Validate Required Fields
+  if (!title || !description || !bounty) {
     notification.error("Please fill in all fields");
     return;
   }
 
-  try {
-    new URL(repo);
-  } catch {
-    notification.error("Invalid Repository URL");
+  if (protocolType === "git" && !repo) {
+    notification.error("Please enter a repository URL");
     return;
+  }
+
+  // Validate Repo (Only for Git)
+  if (protocolType === "git") {
+    if (!parseGithubUrl(repo)) {
+      notification.error("Invalid GitHub Repository URL (must be valid github.com URL)");
+      return;
+    }
   }
 
   // Validate Bounty
@@ -74,11 +89,11 @@ const CreateJobPage: NextPage = () => {
       return;
     }
     if (step === 2) {
-      try {
-        new URL(repo);
-      } catch {
-        notification.error("Invalid Repository URL");
-        return;
+      if (protocolType === "git") {
+        if (!parseGithubUrl(repo)) {
+          notification.error("Invalid GitHub Repository URL");
+          return;
+        }
       }
       if (!description) {
         notification.error("Please enter a description");
@@ -92,7 +107,7 @@ const CreateJobPage: NextPage = () => {
 
   async function handleDeploy() {
     // Final Validation
-    validateValues(title, repo, description, bounty, balance?.value);
+    validateValues(title, repo, description, bounty, protocolType, balance?.value);
 
     try {
       const verificationMode = protocolType === "git" ? 0 : 1;
@@ -127,13 +142,13 @@ const CreateJobPage: NextPage = () => {
         address: address! as `0x${string}`,
         jobAddress: newJobAddress as `0x${string}`,
         role: "CLIENT",
-        details: description,
+        details: JSON.stringify({ description, repoUrl: repo }),
         bounty: parseEther(bounty).toString(),
       });
       notification.remove(id);
       router.push(`/jobs/${newJobAddress}`);
     })();
-  }, [isConfirmed, data, router, address, description, bounty, targetNetwork]);
+  }, [isConfirmed, data, router, address, description, bounty, targetNetwork, repo]);
 
   return (
     <div className="flex h-full bg-base-100 font-mono text-base-content overflow-hidden">
@@ -154,6 +169,7 @@ const CreateJobPage: NextPage = () => {
                 setDescription={setDescription}
                 tags={tags}
                 setTags={setTags}
+                protocolType={protocolType}
               />
             )}
 

@@ -7,6 +7,7 @@ type JobStep2SpecificationsProps = {
   setDescription: (value: string) => void;
   tags: string;
   setTags: (value: string) => void;
+  protocolType: "git" | "manual";
 };
 
 export const JobStep2Specifications: React.FC<JobStep2SpecificationsProps> = ({
@@ -16,6 +17,7 @@ export const JobStep2Specifications: React.FC<JobStep2SpecificationsProps> = ({
   setDescription,
   tags,
   setTags,
+  protocolType,
 }) => {
   const [repoError, setRepoError] = useState("");
 
@@ -48,17 +50,19 @@ export const JobStep2Specifications: React.FC<JobStep2SpecificationsProps> = ({
       </div>
 
       <div className="space-y-6">
-        <label className="block">
-          <span className="text-[10px] font-black uppercase opacity-40 block mb-2 tracking-widest">REPO URL</span>
-          <input
-            type="url"
-            value={repo}
-            onChange={handleRepoChange}
-            placeholder="https://github.com/ogayanfe/merge-dapp"
-            className={`w-full bg-base-200 border p-4 font-mono text-xs uppercase focus:outline-none ${repoError ? "border-error focus:border-error" : "border-base-300 focus:border-primary"}`}
-          />
-          {repoError && <span className="text-error text-[10px] mt-1 block font-bold">{repoError}</span>}
-        </label>
+        {protocolType === "git" && (
+          <label className="block">
+            <span className="text-[10px] font-black uppercase opacity-40 block mb-2 tracking-widest">REPO URL</span>
+            <input
+              type="url"
+              value={repo}
+              onChange={handleRepoChange}
+              placeholder="https://github.com/ogayanfe/merge-dapp"
+              className={`w-full bg-base-200 border p-4 font-mono text-xs uppercase focus:outline-none ${repoError ? "border-error focus:border-error" : "border-base-300 focus:border-primary"}`}
+            />
+            {repoError && <span className="text-error text-[10px] mt-1 block font-bold">{repoError}</span>}
+          </label>
+        )}
 
         <label className="block">
           <span className="text-[10px] font-black uppercase opacity-40 block mb-2 tracking-widest">

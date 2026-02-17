@@ -1,10 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: [
-    "./app/**/*.{js,ts,jsx,tsx}",
-    "./components/**/*.{js,ts,jsx,tsx}",
-    "./utils/**/*.{js,ts,jsx,tsx}",
-  ],
+  content: ["./app/**/*.{js,ts,jsx,tsx}", "./components/**/*.{js,ts,jsx,tsx}", "./utils/**/*.{js,ts,jsx,tsx}"],
   darkMode: ["class", '[data-theme="dark"]'],
   theme: {
     extend: {
@@ -23,7 +19,7 @@ module.exports = {
       boxShadow: {
         "brand-glow": "0 0 20px rgba(99, 102, 241, 0.4)",
         "success-glow": "0 0 15px rgba(16, 185, 129, 0.4)",
-        "surface": "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
+        surface: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)",
       },
       backgroundImage: {
         "grid-pattern": "url('/grid.svg')",
@@ -66,5 +62,3 @@ module.exports = {
     ],
   },
 };
-
-

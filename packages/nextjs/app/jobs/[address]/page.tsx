@@ -45,7 +45,7 @@ export default function JobDetailPage() {
   const _job = {
     ...escrowState,
     address,
-    repoUrl: "",
+    repoUrl: job.repoUrl || "",
     status: status as IJob["status"],
     description: job.description ?? "",
     disputeReason: job.disputeReason,
@@ -61,9 +61,23 @@ export default function JobDetailPage() {
 
         if (!jobRes.data) throw new Error("Couldn't retrieve post details");
 
+        let description = jobRes.data.details as string;
+        let repoUrl = "";
+
+        try {
+          const parsed = JSON.parse(description);
+          if (parsed.description) {
+            description = parsed.description;
+            repoUrl = parsed.repoUrl || "";
+          }
+        } catch (e) {
+          console.log(e);
+        }
+
         setJob(p => ({
           ...p,
-          description: jobRes.data.details as string,
+          description,
+          repoUrl,
           disputeReason: disputeRes.data?.details || undefined,
           disputer: disputeRes.data?.address || undefined,
         }));
