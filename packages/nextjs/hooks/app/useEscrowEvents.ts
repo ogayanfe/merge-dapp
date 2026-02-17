@@ -24,6 +24,7 @@ const EVENT_TITLES: Record<string, string> = {
   FreelancerPaid: "Funds Withdrawn (Freelancer)",
   ClientRefunded: "Funds Withdrawn (Client)",
   DisputeResolved: "Dispute Resolved",
+  DisputeFeeCharged: "Dispute Fee Charged",
 };
 
 export const useEscrowEvents = (address: string, fromBlock?: bigint, onIncomingEvent?: () => void) => {

@@ -50,6 +50,7 @@ contract MergeFactory is Ownable {
         VerificationMode _verificationMode
     ) external payable returns (address) {
         if (msg.value == 0) revert InvalidAmount();
+        require(msg.sender != arbiter, "Arbiter cannot post a job");
         GigEscrow newEscrow = new GigEscrow{ value: msg.value }(_title, msg.sender, arbiter, _IPFSHash, tags, _verificationMode);
 
         JobMetadata memory newJob = JobMetadata({

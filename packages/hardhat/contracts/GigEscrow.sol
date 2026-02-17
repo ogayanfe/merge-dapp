@@ -61,6 +61,7 @@ contract GigEscrow {
     event FreelancerPaid(address freelancer, uint256 amount, uint256 timestamp);
     event ClientRefunded(address client, uint256 amount, uint256 timestamp);
     event DisputeResolved(address arbiter, bool decision, uint256 timestamp, address winner);
+    event DisputeFeeCharged(address arbiter, uint256 fee, uint256 timestamp, uint256 disputePercent);
     event JobCreated(
         uint256 indexed index,
         address indexed client,
@@ -139,7 +140,7 @@ contract GigEscrow {
     function applyForJob() external {
         if (state != EscrowState.OPEN && state != EscrowState.APPLIED) revert InvalidForContractState();
         if (hasApplied[msg.sender]) revert AlreadyApplied();
-        if (msg.sender == client) revert InvalidTransactionSender();
+        if (msg.sender == client || msg.sender == arbiter) revert InvalidTransactionSender();
 
         hasApplied[msg.sender] = true;
         applicants.push(Applicant({ applicant: msg.sender, timestamp: block.timestamp }));
@@ -223,6 +224,7 @@ contract GigEscrow {
         uint256 arbiterFee = (address(this).balance * disputePercent) / 1 ether;
         (bool success, ) = payable(arbiter).call{ value: arbiterFee }("");
         if (!success) revert PaymentFailed();
+        emit DisputeFeeCharged(arbiter, arbiterFee, block.timestamp, disputePercent);
     }
 
     function resolveDispute(bool _payFreelancer) external onlyArbiter {
