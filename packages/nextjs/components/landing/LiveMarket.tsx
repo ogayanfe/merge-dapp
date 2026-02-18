@@ -11,7 +11,7 @@ export const LiveMarket = () => {
           <h2 className="text-5xl md:text-8xl font-black uppercase italic tracking-tighter mb-8 bg-gradient-to-r from-primary via-base-content to-primary bg-clip-text text-transparent">
             View Missions
           </h2>
-          <p className="text-[10px] font-black opacity-30 uppercase tracking-[0.4em]">SYNCING_WITH_ETHEREUM_CHAIN...</p>
+          <p className="text-[10px] font-black opacity-30 uppercase tracking-[0.4em]">SYNCING_WITH_LIVE_CHAIN...</p>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
