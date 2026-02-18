@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { AdjustmentsHorizontalIcon, MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { MagnifyingGlassIcon } from "@heroicons/react/24/outline";
+import { NotificationBell } from "~~/components/scaffold-eth/NotificationBell";
 import { useIdentifyAddress } from "~~/hooks/app/useIdentifyAddress";
 import { notification } from "~~/utils/scaffold-eth";
 
@@ -50,20 +51,18 @@ export const JobHeader = ({ sortOption, setSortOption }: JobHeaderProps) => {
         />
       </form>
       <div className="flex items-center gap-4">
-        <span className="text-[10px] opacity-30 uppercase font-black">Sort by:</span>
-        <select
-          value={sortOption}
-          onChange={e => setSortOption(e.target.value as option)}
-          className="bg-transparent text-[10px] font-black uppercase outline-none border-none cursor-pointer text-primary"
-        >
-          <option value="newest">Newest First</option>
-          <option value="oldest">Oldest First</option>
-          <option value="highest_bounty">Highest Bounty</option>
-          <option value="lowest_bounty">Lowest Bounty</option>
-        </select>
-        <button className="p-2 border border-base-300 hover:border-primary hover:text-primary transition-colors">
-          <AdjustmentsHorizontalIcon className="h-4 w-4" />
-        </button>
+        {setSortOption && (
+          <select
+            className="select select-sm select-bordered font-mono uppercase text-xs"
+            value={sortOption}
+            onChange={e => setSortOption(e.target.value as any)}
+          >
+            <option value="newest">Newest First</option>
+            <option value="bounty_high">Highest Bounty</option>
+            <option value="bounty_low">Lowest Bounty</option>
+          </select>
+        )}
+        <NotificationBell />
       </div>
     </header>
   );

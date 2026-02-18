@@ -6,6 +6,8 @@ import { BanknotesIcon, CheckCircleIcon, CodeBracketIcon } from "@heroicons/reac
 import useMutateEscrowContract from "~~/hooks/app/useMutateEscrow";
 import { IJob } from "~~/types/jobs";
 import { validatePrAgainstRepo } from "~~/utils/github";
+import { notification } from "~~/utils/scaffold-eth";
+import { createNotification } from "~~/utils/superbase/notifications";
 
 interface FreelancerControlsProps {
   job: IJob;
@@ -37,8 +39,12 @@ export const FreelancerControls = ({ job }: FreelancerControlsProps) => {
   useEffect(() => {
     if (isConfirmed) {
       queryClient.invalidateQueries();
+      if (hash === submitHash) {
+        createNotification(job.client, `Work Submitted by Freelancer: Review Now`, `/jobs/${address}`, "SUBMISSION");
+        notification.success("Work submitted successfully");
+      }
     }
-  }, [isConfirmed, queryClient]);
+  }, [isConfirmed, queryClient, hash, submitHash, job.client, address]);
 
   // LOCKED STATE: Submit Work
   if (job.status === "LOCKED") {

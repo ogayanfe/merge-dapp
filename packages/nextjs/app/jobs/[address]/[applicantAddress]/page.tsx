@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import { useAccount } from "wagmi";
+import { useAccount, useWaitForTransactionReceipt } from "wagmi";
 import { ArrowLeftIcon, CheckCircleIcon } from "@heroicons/react/24/outline";
 import { InfoCard } from "~~/components/InfoCard";
 import { UserJobHistory } from "~~/components/user/UserJobHistory";
@@ -15,6 +15,7 @@ import { IEscrowState } from "~~/types/jobs";
 import { notification } from "~~/utils/scaffold-eth";
 import { isZeroAddress } from "~~/utils/scaffold-eth/common";
 import { createJob, getJob } from "~~/utils/superbase/jobs";
+import { createNotification } from "~~/utils/superbase/notifications";
 
 export default function ApplicantDetailPage() {
   const params = useParams();
@@ -32,9 +33,39 @@ export default function ApplicantDetailPage() {
   const applicant = escrowState?.applicants?.[index];
 
   const isClient = connectedAddress === escrowState?.client;
-  const { mutate: _hire, isPending: isHiring } = useMutateEscrowContract(address, "hireFreelancer", [
-    applicant?.applicant,
-  ]);
+  const {
+    mutate: _hire,
+    isPending: isHiring,
+    hash: hireHash,
+  } = useMutateEscrowContract(address, "hireFreelancer", [applicant?.applicant]);
+
+  const { isSuccess: isConfirmed } = useWaitForTransactionReceipt({ hash: hireHash });
+
+  useEffect(() => {
+    if (isConfirmed) {
+      (async () => {
+        const id = notification.loading("Confirming Hire...");
+        await createJob({
+          address: applicantAddress as `0x${string}`,
+          jobAddress: address as `0x${string}`,
+          role: "FREELANCER",
+          details: "Hired for job",
+          bounty: escrowState?.bounty.toString(),
+        });
+
+        // Notify Freelancer
+        await createNotification(
+          applicantAddress,
+          `You have been HIRED!`,
+          `/jobs/${address}/${applicantAddress}`,
+          "HIRED",
+        );
+
+        notification.remove(id);
+        notification.success("Applicant Hired Successfully");
+      })();
+    }
+  }, [isConfirmed, applicantAddress, address, escrowState?.bounty]);
 
   const [proposal, setProposal] = useState<string | null>(null);
 
@@ -57,20 +88,7 @@ export default function ApplicantDetailPage() {
   }
 
   const hire = () => {
-    const id = notification.loading("Hiring Applicant");
     _hire();
-    (async () => {
-      await createJob({
-        address: applicantAddress as `0x${string}`,
-        jobAddress: address as `0x${string}`,
-        role: "FREELANCER",
-        details: "Applied for job",
-        bounty: escrowState?.bounty.toString(),
-      });
-      notification.success("Application tracked successfully");
-    })();
-    notification.remove(id);
-    notification.success("Applicant Hired, Contract is now locked");
   };
 
   if (isError || !escrowState || !applicant) {

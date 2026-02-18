@@ -15,6 +15,7 @@ import useMutateEscrowContract from "~~/hooks/app/useMutateEscrow";
 import { IJob } from "~~/types/jobs";
 import { notification } from "~~/utils/scaffold-eth";
 import { createJob } from "~~/utils/superbase/jobs";
+import { createNotification } from "~~/utils/superbase/notifications";
 
 interface ClientControlsProps {
   job: IJob;
@@ -44,6 +45,21 @@ export const ClientControls = ({ job }: ClientControlsProps) => {
 
   const isActionPending = isCompleting || isDisputing || isRefunding || isConfirming;
 
+  useEffect(() => {
+    if (isConfirmed) {
+      // Funds Released (Completion)
+      if (hash === completeHash) {
+        createNotification(
+          job.freelancer,
+          `Funds Released by Client! Job Completed.`,
+          `/jobs/${address}`,
+          "FUNDS_RELEASED",
+        );
+        notification.success("Job completed and funds released");
+      }
+    }
+  }, [isConfirmed, hash, completeHash, job.freelancer, address]);
+
   const { address: userAddress } = useAccount();
   const [isDisputeModalOpen, setIsDisputeModalOpen] = useState(false);
   const [disputeReason, setDisputeReason] = useState("");
@@ -61,12 +77,49 @@ export const ClientControls = ({ job }: ClientControlsProps) => {
             details: disputeReason,
             bounty: job.bounty.toString(),
           });
+
+          if (job.arbiter) {
+            await createNotification(
+              job.arbiter,
+              `Dispute Raised by Client: ${disputeReason.slice(0, 30)}...`,
+              `/jobs/${address}`,
+              "DISPUTE",
+            );
+          }
+
+          // Notify Freelancer
+          await createNotification(
+            job.freelancer,
+            `Your work has been DISPUTED by the Client: ${disputeReason.slice(0, 30)}...`,
+            `/jobs/${address}`,
+            "DISPUTE",
+          );
+
+          await createNotification(
+            job.client,
+            `You have raised a dispute: ${disputeReason.slice(0, 30)}...`,
+            `/jobs/${address}`,
+            "DISPUTE",
+          );
+
           notification.success("Dispute reason tracked successfully");
           setDisputeReason(""); // Reset reason after tracking
         })();
       }
     }
-  }, [isConfirmed, queryClient, hash, disputeHash, disputeReason, address, userAddress, job.bounty]);
+  }, [
+    isConfirmed,
+    queryClient,
+    hash,
+    disputeHash,
+    disputeReason,
+    address,
+    userAddress,
+    job.bounty,
+    job.arbiter,
+    job.client,
+    job.freelancer,
+  ]);
 
   const handleDispute = (reason: string) => {
     setDisputeReason(reason);
@@ -94,7 +147,7 @@ export const ClientControls = ({ job }: ClientControlsProps) => {
       }, 60000); // Update every minute
       return () => clearInterval(interval);
     }
-  }, [job]);
+  }, [job.status, job.autoReleaseDeadline]);
 
   // IN_REVIEW STATE: Release or Dispute
   if (job.status === "IN_REVIEW" && job.verificationMode === 1) {

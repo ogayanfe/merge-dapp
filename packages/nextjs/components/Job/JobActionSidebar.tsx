@@ -20,6 +20,7 @@ import useMutateEscrowContract from "~~/hooks/app/useMutateEscrow";
 import { IJob } from "~~/types/jobs";
 import { notification } from "~~/utils/scaffold-eth";
 import { createJob } from "~~/utils/superbase/jobs";
+import { createNotification } from "~~/utils/superbase/notifications";
 
 interface JobActionSidebarProps {
   job: IJob;
@@ -67,20 +68,56 @@ export const JobActionSidebar = ({ job }: JobActionSidebarProps) => {
   useEffect(() => {
     if (!isConfirmed) return;
     queryClient.invalidateQueries();
-    if (hash !== applyHash) return;
 
-    // Track Application
-    (async () => {
-      await createJob({
-        address: connectedAddress! as `0x${string}`,
-        jobAddress: address as `0x${string}`,
-        role: "APPLICANT",
-        details: proposal || "Applied for job",
-        bounty: job.bounty.toString(),
-      });
-      notification.success("Application tracked successfully");
-    })();
-  }, [isConfirmed, queryClient, hash, applyHash, address, connectedAddress, job.bounty, proposal]);
+    // Application
+    if (hash === applyHash) {
+      (async () => {
+        await createJob({
+          address: connectedAddress! as `0x${string}`,
+          jobAddress: address as `0x${string}`,
+          role: "APPLICANT",
+          details: proposal || "Applied for job",
+          bounty: job.bounty.toString(),
+        });
+        // Notify Client
+        await createNotification(
+          job.client,
+          `New Application from ${connectedAddress?.slice(0, 6)}...`,
+          `/jobs/${address}`,
+          "APPLICATION",
+        );
+        notification.success("Application tracked successfully");
+      })();
+    }
+
+    // Arbiter Resolutions
+    if (hash === resolveToFreelancerHash) {
+      // Notify Freelancer (Winner)
+      createNotification(job.freelancer, `Dispute Resolved in your favor!`, `/jobs/${address}`, "RESOLVED");
+      // Notify Client (Loser)
+      createNotification(job.client, `Dispute Resolved: Funds released to Freelancer`, `/jobs/${address}`, "RESOLVED");
+    }
+
+    if (hash === resolveToClientHash) {
+      // Notify Client (Winner)
+      createNotification(job.client, `Dispute Resolved in your favor!`, `/jobs/${address}`, "RESOLVED");
+      // Notify Freelancer (Loser)
+      createNotification(job.freelancer, `Dispute Resolved: Funds returned to Client`, `/jobs/${address}`, "RESOLVED");
+    }
+  }, [
+    isConfirmed,
+    queryClient,
+    hash,
+    applyHash,
+    resolveToFreelancerHash,
+    resolveToClientHash,
+    address,
+    connectedAddress,
+    job.bounty,
+    proposal,
+    job.client,
+    job.freelancer,
+  ]);
 
   const handleApply = (text: string) => {
     setProposal(text);
@@ -90,6 +127,23 @@ export const JobActionSidebar = ({ job }: JobActionSidebarProps) => {
 
   return (
     <aside className="w-96 border-l border-base-300 bg-base-200/30 flex flex-col h-full shadow-2xl">
+      {/* Role Badge */}
+      {isClient && (
+        <div className="bg-primary text-primary-content text-center py-2 text-[10px] font-black uppercase tracking-widest animate-fade-in">
+          You are the Client
+        </div>
+      )}
+      {isFreelancer && (
+        <div className="bg-secondary text-secondary-content text-center py-2 text-[10px] font-black uppercase tracking-widest animate-fade-in">
+          You are the Freelancer
+        </div>
+      )}
+      {isArbiter && (
+        <div className="bg-warning text-warning-content text-center py-2 text-[10px] font-black uppercase tracking-widest animate-fade-in">
+          You are the Arbiter
+        </div>
+      )}
+
       <div className="p-8 border-b border-base-300 bg-base-100">
         <div className="flex justify-between items-start mb-8">
           <div>
