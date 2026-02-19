@@ -1,11 +1,13 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { NextPage } from "next";
 import { formatEther, parseEther } from "viem";
 import { useAccount, useBalance, useWaitForTransactionReceipt } from "wagmi";
+import { ArrowLeftIcon } from "@heroicons/react/20/solid";
 import { JobStep1Protocol } from "~~/components/jobs/JobStep1Protocol";
 import { JobStep2Specifications } from "~~/components/jobs/JobStep2Specifications";
 import { JobStep3Capitalization } from "~~/components/jobs/JobStep3Capitalization";
@@ -156,6 +158,12 @@ const CreateJobPage: NextPage = () => {
 
       <main className="flex-1 flex flex-col h-full bg-base-100 overflow-y-auto">
         <div className="max-w-3xl mx-auto py-20 px-12 w-full">
+          <Link
+            href="/jobs"
+            className="flex items-center gap-2 text-[10px] font-black uppercase opacity-40 hover:opacity-100 transition-opacity mb-12 lg:hidden"
+          >
+            <ArrowLeftIcon className="h-3 w-3" /> Back to Terminal
+          </Link>
           <motion.div initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} key={step} className="space-y-12">
             {step === 1 && (
               <JobStep1Protocol title={title} setTitle={setTitle} jobType={protocolType} setJobType={setProtocolType} />

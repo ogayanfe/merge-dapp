@@ -35,7 +35,7 @@ export const JobHeader = ({ sortOption, setSortOption }: JobHeaderProps) => {
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   return (
-    <header className="h-16 border-b border-base-300 flex items-center justify-between px-8 bg-base-100/50 backdrop-blur-md z-10">
+    <header className="h-16 border-b border-base-300 flex items-center justify-between px-8 bg-base-100/50 backdrop-blur-md z-40 relative">
       <form className="flex items-center gap-4 flex-1 max-w-xl" onSubmit={handleSubmit}>
         {checking ? (
           <span className="loading loading-spinner loading-lg text-primary"></span>

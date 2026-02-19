@@ -15,7 +15,7 @@ const steps = [
 
 export const JobStepIndicator: React.FC<JobStepIndicatorProps> = ({ currentStep }) => {
   return (
-    <aside className="w-80 border-r border-base-300 flex flex-col h-full bg-base-200/30 p-8">
+    <aside className="w-80 border-r border-base-300 flex flex-col h-full bg-base-200/30 p-8 max-lg:hidden">
       <Link
         href="/jobs"
         className="flex items-center gap-2 text-[10px] font-black uppercase opacity-40 hover:opacity-100 transition-opacity mb-12"

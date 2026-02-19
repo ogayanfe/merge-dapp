@@ -24,9 +24,11 @@ import { createNotification } from "~~/utils/superbase/notifications";
 
 interface JobActionSidebarProps {
   job: IJob;
+  isOpen: boolean;
+  onClose: () => void;
 }
 
-export const JobActionSidebar = ({ job }: JobActionSidebarProps) => {
+export const JobActionSidebar = ({ job, isOpen, onClose }: JobActionSidebarProps) => {
   const { address } = useParams() as { address: string };
   const queryClient = useQueryClient();
   const { address: connectedAddress } = useAccount();
@@ -125,110 +127,139 @@ export const JobActionSidebar = ({ job }: JobActionSidebarProps) => {
     setIsApplyingModalOpen(false);
   };
 
-  return (
-    <aside className="w-96 border-l border-base-300 bg-base-200/30 flex flex-col h-full shadow-2xl">
-      {/* Role Badge */}
-      {isClient && (
-        <div className="bg-primary text-primary-content text-center py-2 text-[10px] font-black uppercase tracking-widest animate-fade-in">
-          You are the Client
-        </div>
-      )}
-      {isFreelancer && (
-        <div className="bg-secondary text-secondary-content text-center py-2 text-[10px] font-black uppercase tracking-widest animate-fade-in">
-          You are the Freelancer
-        </div>
-      )}
-      {isArbiter && (
-        <div className="bg-warning text-warning-content text-center py-2 text-[10px] font-black uppercase tracking-widest animate-fade-in">
-          You are the Arbiter
-        </div>
-      )}
+  // Mobile Overlay Classes
+  const sidebarClasses = `
+    w-96 border-l border-base-300 bg-base-200/95 backdrop-blur flex flex-col h-full shadow-2xl
+    fixed inset-y-0 right-0 z-50 transform transition-transform duration-300 ease-in-out
+    lg:relative lg:translate-x-0 lg:bg-base-200/30 lg:z-auto
+    ${isOpen ? "translate-x-0" : "translate-x-full"}
+  `;
 
-      <div className="p-8 border-b border-base-300 bg-base-100">
-        <div className="flex justify-between items-start mb-8">
-          <div>
-            <span className="text-[10px] uppercase opacity-40 block font-black mb-1">Status</span>
-            <div className={`flex items-center gap-2 ${job.status === "OPEN" ? "text-primary" : "text-warning"}`}>
-              <div
-                className={`w-2 h-2 rounded-full ${
-                  job.status === "OPEN" ? "bg-primary" : "bg-warning"
-                } animate-pulse shadow-brand-glow`}
-              ></div>
-              <span className="font-black text-sm uppercase italic">{job.status}</span>
+  return (
+    <>
+      {/* Backdrop */}
+      {isOpen && <div className="fixed inset-0 bg-black/50 z-40 lg:hidden backdrop-blur-sm" onClick={onClose}></div>}
+
+      <aside className={sidebarClasses}>
+        {/* Close Button Mobile */}
+        <button
+          onClick={onClose}
+          className="lg:hidden absolute top-4 left-4 p-2 bg-base-100 rounded-full shadow-md z-50 border border-base-300"
+        >
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 24 24"
+            strokeWidth={1.5}
+            stroke="currentColor"
+            className="w-5 h-5"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+
+        {/* Role Badge */}
+        {isClient && (
+          <div className="bg-primary text-primary-content text-center py-2 text-[10px] font-black uppercase tracking-widest animate-fade-in">
+            You are the Client
+          </div>
+        )}
+        {isFreelancer && (
+          <div className="bg-secondary text-secondary-content text-center py-2 text-[10px] font-black uppercase tracking-widest animate-fade-in">
+            You are the Freelancer
+          </div>
+        )}
+        {isArbiter && (
+          <div className="bg-warning text-warning-content text-center py-2 text-[10px] font-black uppercase tracking-widest animate-fade-in">
+            You are the Arbiter
+          </div>
+        )}
+
+        <div className="p-8 border-b border-base-300 bg-base-100">
+          <div className="flex justify-between items-start mb-8">
+            <div>
+              <span className="text-[10px] uppercase opacity-40 block font-black mb-1">Status</span>
+              <div className={`flex items-center gap-2 ${job.status === "OPEN" ? "text-primary" : "text-warning"}`}>
+                <div
+                  className={`w-2 h-2 rounded-full ${
+                    job.status === "OPEN" ? "bg-primary" : "bg-warning"
+                  } animate-pulse shadow-brand-glow`}
+                ></div>
+                <span className="font-black text-sm uppercase italic">{job.status}</span>
+              </div>
+            </div>
+            <div className="text-right">
+              <span className="text-[10px] uppercase opacity-40 block font-black mb-1">Contract Balance</span>
+              <span className="text-3xl font-black text-primary italic tracking-tight">
+                {formatEther(job.bounty)} ETH
+              </span>
             </div>
           </div>
-          <div className="text-right">
-            <span className="text-[10px] uppercase opacity-40 block font-black mb-1">Contract Balance</span>
-            <span className="text-3xl font-black text-primary italic tracking-tight">
-              {formatEther(job.bounty)} ETH
-            </span>
-          </div>
-        </div>
 
-        {/* MODULAR CONTROLS */}
-        {isClient && <ClientControls job={job} />}
-        {isFreelancer && <FreelancerControls job={job} />}
+          {/* MODULAR CONTROLS */}
+          {isClient && <ClientControls job={job} />}
+          {isFreelancer && <FreelancerControls job={job} />}
 
-        {/* Client Cancel (Pre-Lock) - Can stay here or move to ClientControls if we pass cancel logic */}
-        {isClient && (job.status === "OPEN" || job.status === "APPLYING") && (
-          <button
-            onClick={() => cancelJob()}
-            disabled={isActionPending}
-            className="w-full py-4 bg-error/10 text-error border border-error/20 font-black uppercase text-xs hover:bg-error/20 transition-all flex items-center justify-center gap-2 mt-4"
-          >
-            {isActionPending ? (
-              <span className="loading loading-spinner loading-xs"></span>
-            ) : (
-              <TrashIcon className="h-4 w-4" />
-            )}
-            Cancel Job
-          </button>
-        )}
-
-        {/* Arbiter Actions */}
-        {isArbiter && job.status === "DISPUTED" && (
-          <div className="grid grid-cols-2 gap-4">
+          {/* Client Cancel (Pre-Lock) - Can stay here or move to ClientControls if we pass cancel logic */}
+          {isClient && (job.status === "OPEN" || job.status === "APPLYING") && (
             <button
-              onClick={() => resolveToFreelancer()}
+              onClick={() => cancelJob()}
               disabled={isActionPending}
-              className="py-4 bg-success text-success-content font-black uppercase text-[10px] hover:bg-success/90 transition-all flex flex-col items-center justify-center gap-1"
+              className="w-full py-4 bg-error/10 text-error border border-error/20 font-black uppercase text-xs hover:bg-error/20 transition-all flex items-center justify-center gap-2 mt-4"
             >
-              {isResolvingToFreelancer ? (
+              {isActionPending ? (
                 <span className="loading loading-spinner loading-xs"></span>
               ) : (
-                <CheckCircleIcon className="h-4 w-4" />
+                <TrashIcon className="h-4 w-4" />
               )}
-              Pay Freelancer
+              Cancel Job
             </button>
-            <button
-              onClick={() => resolveToClient()}
-              disabled={isActionPending}
-              className="py-4 bg-error text-error-content font-black uppercase text-[10px] hover:bg-error/90 transition-all flex flex-col items-center justify-center gap-1"
-            >
-              {isResolvingToClient ? (
-                <span className="loading loading-spinner loading-xs"></span>
-              ) : (
-                <XCircleIcon className="h-4 w-4" />
-              )}
-              Refund Client
-            </button>
-          </div>
-        )}
+          )}
 
-        {/* Applicant / Guest Actions */}
-        {!isClient && !isFreelancer && !isArbiter && (
-          <div className="space-y-4">
-            {!connectedAddress ? (
-              <div className="flex flex-col gap-2">
-                <RainbowKitCustomConnectButton />
-                <p className="text-[10px] text-center opacity-40 uppercase">Connect wallet to apply</p>
-              </div>
-            ) : (
-              <>
-                <button
-                  onClick={() => setIsApplyingModalOpen(true)}
-                  disabled={job.applied || isActionPending || !job.canApply}
-                  className={`w-full py-4 flex items-center justify-center gap-3 font-black uppercase text-sm transition-all shadow-xl
+          {/* Arbiter Actions */}
+          {isArbiter && job.status === "DISPUTED" && (
+            <div className="grid grid-cols-2 gap-4">
+              <button
+                onClick={() => resolveToFreelancer()}
+                disabled={isActionPending}
+                className="py-4 bg-success text-success-content font-black uppercase text-[10px] hover:bg-success/90 transition-all flex flex-col items-center justify-center gap-1"
+              >
+                {isResolvingToFreelancer ? (
+                  <span className="loading loading-spinner loading-xs"></span>
+                ) : (
+                  <CheckCircleIcon className="h-4 w-4" />
+                )}
+                Pay Freelancer
+              </button>
+              <button
+                onClick={() => resolveToClient()}
+                disabled={isActionPending}
+                className="py-4 bg-error text-error-content font-black uppercase text-[10px] hover:bg-error/90 transition-all flex flex-col items-center justify-center gap-1"
+              >
+                {isResolvingToClient ? (
+                  <span className="loading loading-spinner loading-xs"></span>
+                ) : (
+                  <XCircleIcon className="h-4 w-4" />
+                )}
+                Refund Client
+              </button>
+            </div>
+          )}
+
+          {/* Applicant / Guest Actions */}
+          {!isClient && !isFreelancer && !isArbiter && (
+            <div className="space-y-4">
+              {!connectedAddress ? (
+                <div className="flex flex-col gap-2">
+                  <RainbowKitCustomConnectButton />
+                  <p className="text-[10px] text-center opacity-40 uppercase">Connect wallet to apply</p>
+                </div>
+              ) : (
+                <>
+                  <button
+                    onClick={() => setIsApplyingModalOpen(true)}
+                    disabled={job.applied || isActionPending || !job.canApply}
+                    className={`w-full py-4 flex items-center justify-center gap-3 font-black uppercase text-sm transition-all shadow-xl
                                       ${
                                         (job.status === "OPEN" || job.status === "APPLYING") &&
                                         job.canApply &&
@@ -237,122 +268,117 @@ export const JobActionSidebar = ({ job }: JobActionSidebarProps) => {
                                           : "bg-base-200 text-base-content/20 border border-base-300 cursor-not-allowed"
                                       }
                                   `}
-                >
-                  {isApplying ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-white/20 border-t-white animate-spin rounded-full"></div>
-                      Processing...
-                    </>
-                  ) : (
-                    <>
-                      <ShieldCheckIcon className="h-5 w-5" />
-                      {job.status == "CANCELLED"
-                        ? "JOB CANCELLED"
-                        : job.applied
-                          ? "Already Applied"
-                          : job.canApply
-                            ? "Apply For Job"
-                            : "Cannot Apply"}
-                    </>
-                  )}
-                </button>
-                <ModalInput
-                  isOpen={isApplyingModalOpen}
-                  onClose={() => setIsApplyingModalOpen(false)}
-                  onSubmit={handleApply}
-                  title="Apply for Job"
-                  label="Submit a Proposal (Why are you the best fit?)"
-                  placeholder="Write your proposal here..."
-                />
-              </>
-            )}
-          </div>
-        )}
-
-        {/* Withdrawal State Info (Non-interactive) */}
-        {job.status === "COMPLETED" && job.bounty === 0n && !isFreelancer && (
-          <div className="mt-4 w-full py-3 bg-base-200 border border-base-300 text-base-content/50 font-black uppercase text-[10px] flex items-center justify-center gap-2">
-            <CheckCircleIcon className="h-3 w-3" /> Funds Withdrawn by Freelancer
-          </div>
-        )}
-        {job.status === "CANCELLED" && job.bounty === 0n && !isClient && (
-          <div className="mt-4 w-full py-3 bg-base-200 border border-base-300 text-base-content/50 font-black uppercase text-[10px] flex items-center justify-center gap-2">
-            <CheckCircleIcon className="h-3 w-3" /> Funds Withdrawn by Client
-          </div>
-        )}
-
-        {/* Dispute Fee Note */}
-        {job.status === "DISPUTED" && (
-          <p className="mt-4 text-[9px] text-center text-warning opacity-80 uppercase leading-relaxed font-black">
-            Note: 1% fee is deducted from disputed contracts.
-          </p>
-        )}
-      </div>
-
-      <div className="flex-1 overflow-y-auto p-8 space-y-8">
-        <div>
-          <h3 className="text-[10px] font-black uppercase tracking-[0.2em] opacity-30 mb-6 flex items-center gap-2">
-            <UserCircleIcon className="h-4 w-4" /> Participants
-          </h3>
-          <div className="space-y-4">
-            {/* Client */}
-            <div className="flex justify-between items-end">
-              <span className="text-xs font-black uppercase">
-                <Address address={job.client} />
-              </span>
-              <span className="text-[10px] opacity-50">Client</span>
+                  >
+                    {isApplying ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white/20 border-t-white animate-spin rounded-full"></div>
+                        Processing...
+                      </>
+                    ) : (
+                      <>
+                        <ShieldCheckIcon className="h-5 w-5" />
+                        {job.status == "CANCELLED"
+                          ? "JOB CANCELLED"
+                          : job.applied
+                            ? "Already Applied"
+                            : job.canApply
+                              ? "Apply For Job"
+                              : "Cannot Apply"}
+                      </>
+                    )}
+                  </button>
+                  <ModalInput
+                    isOpen={isApplyingModalOpen}
+                    onClose={() => setIsApplyingModalOpen(false)}
+                    onSubmit={handleApply}
+                    title="Apply for Job"
+                    label="Submit a Proposal (Why are you the best fit?)"
+                    placeholder="Write your proposal here..."
+                  />
+                </>
+              )}
             </div>
+          )}
 
-            {/* Freelancer */}
-            {job.freelancer && job.freelancer !== "0x0000000000000000000000000000000000000000" && (
-              <div className="flex justify-between items-end pt-2 border-t border-base-content/5">
+          {/* Withdrawal State Info (Non-interactive) */}
+          {job.status === "COMPLETED" && job.bounty === 0n && !isFreelancer && (
+            <div className="mt-4 w-full py-3 bg-base-200 border border-base-300 text-base-content/50 font-black uppercase text-[10px] flex items-center justify-center gap-2">
+              <CheckCircleIcon className="h-3 w-3" /> Funds Withdrawn by Freelancer
+            </div>
+          )}
+          {job.status === "CANCELLED" && job.bounty === 0n && !isClient && (
+            <div className="mt-4 w-full py-3 bg-base-200 border border-base-300 text-base-content/50 font-black uppercase text-[10px] flex items-center justify-center gap-2">
+              <CheckCircleIcon className="h-3 w-3" /> Funds Withdrawn by Client
+            </div>
+          )}
+
+          {/* Dispute Fee Note */}
+          {job.status === "DISPUTED" && (
+            <p className="mt-4 text-[9px] text-center text-warning opacity-80 uppercase leading-relaxed font-black">
+              Note: 1% fee is deducted from disputed contracts.
+            </p>
+          )}
+        </div>
+
+        <div className="flex-1 overflow-y-auto p-8 space-y-8">
+          <div>
+            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] opacity-30 mb-6 flex items-center gap-2">
+              <UserCircleIcon className="h-4 w-4" /> Participants
+            </h3>
+            <div className="space-y-4">
+              {/* Client */}
+              <div className="flex justify-between items-end">
                 <span className="text-xs font-black uppercase">
-                  <Address address={job.freelancer} />
+                  <Address address={job.client} />
                 </span>
-                <span className="text-[10px] opacity-50">Freelancer</span>
+                <span className="text-[10px] opacity-50">Client</span>
               </div>
-            )}
 
-            {/* Arbiter */}
-            {job.arbiter && job.arbiter !== "0x0000000000000000000000000000000000000000" && (
-              <div className="flex justify-between items-end pt-2 border-t border-base-content/5">
-                <span className="text-xs font-black uppercase">
-                  <Address address={job.arbiter} />
-                </span>
-                <span className="text-[10px] opacity-50">Arbiter</span>
+              {/* Freelancer */}
+              {job.freelancer && job.freelancer !== "0x0000000000000000000000000000000000000000" && (
+                <div className="flex justify-between items-end pt-2 border-t border-base-content/5">
+                  <span className="text-xs font-black uppercase">
+                    <Address address={job.freelancer} />
+                  </span>
+                  <span className="text-[10px] opacity-50">Freelancer</span>
+                </div>
+              )}
+
+              {/* Arbiter */}
+              {job.arbiter && job.arbiter !== "0x0000000000000000000000000000000000000000" && (
+                <div className="flex justify-between items-end pt-2 border-t border-base-content/5">
+                  <span className="text-xs font-black uppercase">
+                    <Address address={job.arbiter} />
+                  </span>
+                  <span className="text-[10px] opacity-50">Arbiter</span>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div>
+            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] opacity-30 mb-6 flex items-center gap-2">
+              <ClockIcon className="h-4 w-4" /> Activity Protocol
+            </h3>
+            <div className="space-y-4 font-mono text-[9px]">
+              <div className="flex gap-3">
+                <span className="opacity-20 italic">14:22</span>
+                <span className="opacity-60 underline uppercase">Job Deployed by Client</span>
               </div>
-            )}
+              <div className="flex gap-3">
+                <span className="opacity-20 italic">14:55</span>
+                <span className="opacity-60 uppercase">Contract Funds Verified</span>
+              </div>
+              {job.freelancer === connectedAddress && (
+                <div className="flex gap-3 text-primary">
+                  <span className="opacity-50 italic">18:42</span>
+                  <span className="font-black uppercase tracking-widest">Protocol Accepted By You</span>
+                </div>
+              )}
+            </div>
           </div>
         </div>
-
-        <div>
-          <h3 className="text-[10px] font-black uppercase tracking-[0.2em] opacity-30 mb-6 flex items-center gap-2">
-            <ClockIcon className="h-4 w-4" /> Activity Protocol
-          </h3>
-          <div className="space-y-4 font-mono text-[9px]">
-            <div className="flex gap-3">
-              <span className="opacity-20 italic">14:22</span>
-              <span className="opacity-60 underline uppercase">Job Deployed by Client</span>
-            </div>
-            <div className="flex gap-3">
-              <span className="opacity-20 italic">14:55</span>
-              <span className="opacity-60 uppercase">Contract Funds Verified</span>
-            </div>
-            {job.freelancer === connectedAddress && (
-              <div className="flex gap-3 text-primary">
-                <span className="opacity-50 italic">18:42</span>
-                <span className="font-black uppercase tracking-widest">Protocol Accepted By You</span>
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      <div className="p-8 border-t border-base-300 bg-base-100">
-        <div className="flex items-center gap-2 text-[10px] font-black opacity-30 uppercase tracking-widest">
-          <ShieldCheckIcon className="h-4 w-4" /> Programmable Escrow v2.4
-        </div>
-      </div>
-    </aside>
+      </aside>
+    </>
   );
 };

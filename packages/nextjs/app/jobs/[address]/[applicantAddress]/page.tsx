@@ -2,7 +2,7 @@
 
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { useAccount, useWaitForTransactionReceipt } from "wagmi";
 import { ArrowLeftIcon, CheckCircleIcon } from "@heroicons/react/24/outline";
 import { InfoCard } from "~~/components/InfoCard";
@@ -22,6 +22,7 @@ export default function ApplicantDetailPage() {
   const address = params.address as string;
   const applicantAddress = params.applicantAddress as string;
   const { address: connectedAddress } = useAccount();
+  const router = useRouter();
 
   const {
     data: escrowState,
@@ -63,6 +64,7 @@ export default function ApplicantDetailPage() {
 
         notification.remove(id);
         notification.success("Applicant Hired Successfully");
+        router.push(`/jobs/${address}`);
       })();
     }
   }, [isConfirmed, applicantAddress, address, escrowState?.bounty]);

@@ -89,7 +89,7 @@ export const NotificationBell = () => {
       </button>
 
       {isOpen && (
-        <div className="absolute right-0 mt-2 w-80 bg-base-100 border border-base-300 shadow-xl rounded-xl overflow-hidden z-50 animate-in fade-in slide-in-from-top-2">
+        <div className="absolute right-0 mt-2 w-80 bg-base-100 border border-base-300 shadow-xl rounded-xl overflow-hidden z-[1000] animate-in fade-in slide-in-from-top-2">
           <div className="p-3 border-b border-base-300 bg-base-200/50 flex justify-between items-center backdrop-blur-md">
             <h3 className="font-black text-xs uppercase tracking-widest opacity-80">Notifications</h3>
             {unreadCount > 0 && (

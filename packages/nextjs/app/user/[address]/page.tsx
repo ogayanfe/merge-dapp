@@ -27,7 +27,7 @@ export default function UserProfilePage() {
     return (
       <div className="flex h-full items-center justify-center bg-base-100/50 backdrop-blur-sm">
         <span className="loading loading-spinner loading-lg text-primary"></span>
-        <span className="ml-4 font-mono text-sm uppercase tracking-widest opacity-60">Loading Job Info...</span>
+        <span className="ml-4 font-mono text-sm uppercase tracking-widest opacity-60">Loading User Info...</span>
       </div>
     );
   }

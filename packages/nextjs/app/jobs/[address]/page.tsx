@@ -26,6 +26,7 @@ export default function JobDetailPage() {
   const { address: connectedAddress } = useAccount();
   const [loadingFromSupabase, setLoadingFromSupabase] = useState(false);
   const [job, setJob] = useState<Partial<IJob>>({});
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const {
     data: escrowState,
@@ -103,12 +104,29 @@ export default function JobDetailPage() {
   const peerAddress = isClient ? escrowState.freelancer : isFreelancer ? escrowState.client : undefined;
 
   return (
-    <div className="flex h-full bg-base-100 font-mono text-base-content overflow-hidden">
+    <div className="flex h-full bg-base-100 font-mono text-base-content overflow-hidden relative">
       {/* Detail Pane */}
       <JobDetailPane job={_job} onEvent={handleEvent} />
 
       {/* Action Sidebar */}
-      <JobActionSidebar job={_job} />
+      <JobActionSidebar job={_job} isOpen={isSidebarOpen} onClose={() => setIsSidebarOpen(false)} />
+
+      {/* Mobile FAB */}
+      <button
+        onClick={() => setIsSidebarOpen(true)}
+        className="lg:hidden fixed bottom-6 right-6 z-40 bg-primary text-primary-content p-4 rounded-full shadow-brand-glow hover:scale-110 transition-transform active:scale-95 flex items-center justify-center animate-bounce-in"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          fill="none"
+          viewBox="0 0 24 24"
+          strokeWidth={2}
+          stroke="currentColor"
+          className="w-6 h-6"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+        </svg>
+      </button>
 
       {/* Chat Widget - Visible only to participants when job is not OPEN */}
       {/* Chat Widget - Visible only to participants when job is not OPEN/APPLYING */}
