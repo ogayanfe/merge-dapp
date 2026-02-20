@@ -151,10 +151,9 @@ export const JobActionSidebar = ({ job, isOpen, onClose }: JobActionSidebarProps
       <aside className={sidebarClasses}>
         {/* Sidebar Background with Blur - Separated to avoid trapping fixed children */}
         <div className="absolute inset-0 bg-base-200/95 lg:bg-base-200/30 backdrop-blur -z-10 border-l border-base-300"></div>
-        {/* Close Button Mobile */}
         <button
           onClick={onClose}
-          className="lg:hidden absolute top-4 left-4 p-2 bg-base-100 rounded-full shadow-md z-50 border border-base-300"
+          className="lg:hidden absolute top-4 left-4 p-2 bg-base-100 rounded-full shadow-md z-[60] border border-base-300"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"

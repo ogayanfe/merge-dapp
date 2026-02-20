@@ -81,7 +81,7 @@ export const JobSidebar = ({
             Control Panel
           </h2>
           {/* Close Button Mobile */}
-          <button onClick={onClose} className="lg:hidden p-1 hover:bg-base-300 rounded">
+          <button onClick={onClose} className="lg:hidden p-1 hover:bg-base-300 rounded z-[60]">
             <svg
               xmlns="http://www.w3.org/2000/svg"
               fill="none"

@@ -55,9 +55,10 @@ export const JobHeader = ({ sortOption, setSortOption }: JobHeaderProps) => {
           <select
             className="select select-sm select-bordered font-mono uppercase text-xs"
             value={sortOption}
-            onChange={e => setSortOption(e.target.value as any)}
+            onChange={e => setSortOption(e.target.value as option)}
           >
             <option value="newest">Newest First</option>
+            <option value="oldest">Oldest First</option>
             <option value="bounty_high">Highest Bounty</option>
             <option value="bounty_low">Lowest Bounty</option>
           </select>
