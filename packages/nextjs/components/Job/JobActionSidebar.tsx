@@ -129,9 +129,9 @@ export const JobActionSidebar = ({ job, isOpen, onClose }: JobActionSidebarProps
 
   // Mobile Overlay Classes
   const sidebarClasses = `
-    w-96 border-l border-base-300 bg-base-200/95 backdrop-blur flex flex-col h-full shadow-2xl
+    w-96 flex flex-col h-full shadow-2xl
     fixed inset-y-0 right-0 z-50 transform transition-transform duration-300 ease-in-out
-    lg:relative lg:translate-x-0 lg:bg-base-200/30 lg:z-auto
+    lg:relative lg:translate-x-0 lg:transform-none lg:z-auto
     ${isOpen ? "translate-x-0" : "translate-x-full"}
   `;
 
@@ -139,8 +139,18 @@ export const JobActionSidebar = ({ job, isOpen, onClose }: JobActionSidebarProps
     <>
       {/* Backdrop */}
       {isOpen && <div className="fixed inset-0 bg-black/50 z-40 lg:hidden backdrop-blur-sm" onClick={onClose}></div>}
+      <ModalInput
+        isOpen={isApplyingModalOpen}
+        onClose={() => setIsApplyingModalOpen(false)}
+        onSubmit={handleApply}
+        title="Apply for Job"
+        label="Submit a Proposal (Why are you the best fit?)"
+        placeholder="Write your proposal here..."
+      />
 
       <aside className={sidebarClasses}>
+        {/* Sidebar Background with Blur - Separated to avoid trapping fixed children */}
+        <div className="absolute inset-0 bg-base-200/95 lg:bg-base-200/30 backdrop-blur -z-10 border-l border-base-300"></div>
         {/* Close Button Mobile */}
         <button
           onClick={onClose}
@@ -287,14 +297,6 @@ export const JobActionSidebar = ({ job, isOpen, onClose }: JobActionSidebarProps
                       </>
                     )}
                   </button>
-                  <ModalInput
-                    isOpen={isApplyingModalOpen}
-                    onClose={() => setIsApplyingModalOpen(false)}
-                    onSubmit={handleApply}
-                    title="Apply for Job"
-                    label="Submit a Proposal (Why are you the best fit?)"
-                    placeholder="Write your proposal here..."
-                  />
                 </>
               )}
             </div>

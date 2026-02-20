@@ -21,7 +21,7 @@ const deployYourContract: DeployFunction = async function (hre: HardhatRuntimeEn
   */
   const { deployer } = await hre.getNamedAccounts();
   const { deploy } = hre.deployments;
-  const arbiter = "0x59c7B7460f234B6E698FF07CcE86BF98aEa96819";
+  const arbiter = "0x435Ee927E766ED8Fa0e6a29aBA4F6aD1663cAbf9";
 
   await deploy("MergeFactory", {
     from: deployer,

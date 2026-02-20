@@ -425,6 +425,426 @@ const deployedContracts = {
       deployedOnBlock: 1,
     },
   },
+  421614: {
+    MergeFactory: {
+      address: "0x2B8D5d4B1cf94FC4557349005491Cd626C374bF9",
+      abi: [
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "_owner",
+              type: "address",
+            },
+            {
+              internalType: "address",
+              name: "_arbiter",
+              type: "address",
+            },
+          ],
+          stateMutability: "nonpayable",
+          type: "constructor",
+        },
+        {
+          inputs: [],
+          name: "InvalidAmount",
+          type: "error",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "owner",
+              type: "address",
+            },
+          ],
+          name: "OwnableInvalidOwner",
+          type: "error",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "account",
+              type: "address",
+            },
+          ],
+          name: "OwnableUnauthorizedAccount",
+          type: "error",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "uint256",
+              name: "index",
+              type: "uint256",
+            },
+            {
+              indexed: true,
+              internalType: "address",
+              name: "client",
+              type: "address",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "bounty",
+              type: "uint256",
+            },
+            {
+              indexed: false,
+              internalType: "string",
+              name: "title",
+              type: "string",
+            },
+            {
+              indexed: false,
+              internalType: "string",
+              name: "tags",
+              type: "string",
+            },
+            {
+              indexed: false,
+              internalType: "enum VerificationMode",
+              name: "verificationMode",
+              type: "uint8",
+            },
+            {
+              indexed: false,
+              internalType: "address",
+              name: "escrowAddress",
+              type: "address",
+            },
+            {
+              indexed: false,
+              internalType: "uint256",
+              name: "postedTime",
+              type: "uint256",
+            },
+            {
+              indexed: false,
+              internalType: "string",
+              name: "IPFSHash",
+              type: "string",
+            },
+          ],
+          name: "JobCreated",
+          type: "event",
+        },
+        {
+          anonymous: false,
+          inputs: [
+            {
+              indexed: true,
+              internalType: "address",
+              name: "previousOwner",
+              type: "address",
+            },
+            {
+              indexed: true,
+              internalType: "address",
+              name: "newOwner",
+              type: "address",
+            },
+          ],
+          name: "OwnershipTransferred",
+          type: "event",
+        },
+        {
+          inputs: [],
+          name: "arbiter",
+          outputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          name: "escrowStates",
+          outputs: [
+            {
+              internalType: "uint256",
+              name: "index",
+              type: "uint256",
+            },
+            {
+              internalType: "address",
+              name: "client",
+              type: "address",
+            },
+            {
+              internalType: "uint256",
+              name: "bounty",
+              type: "uint256",
+            },
+            {
+              internalType: "string",
+              name: "title",
+              type: "string",
+            },
+            {
+              internalType: "address",
+              name: "escrowAddress",
+              type: "address",
+            },
+            {
+              internalType: "uint256",
+              name: "postedTime",
+              type: "uint256",
+            },
+            {
+              internalType: "string",
+              name: "IPFSHash",
+              type: "string",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "_escrowAddress",
+              type: "address",
+            },
+          ],
+          name: "getJobByEscrowAddress",
+          outputs: [
+            {
+              components: [
+                {
+                  internalType: "uint256",
+                  name: "index",
+                  type: "uint256",
+                },
+                {
+                  internalType: "address",
+                  name: "client",
+                  type: "address",
+                },
+                {
+                  internalType: "uint256",
+                  name: "bounty",
+                  type: "uint256",
+                },
+                {
+                  internalType: "string",
+                  name: "title",
+                  type: "string",
+                },
+                {
+                  internalType: "address",
+                  name: "escrowAddress",
+                  type: "address",
+                },
+                {
+                  internalType: "uint256",
+                  name: "postedTime",
+                  type: "uint256",
+                },
+                {
+                  internalType: "string",
+                  name: "IPFSHash",
+                  type: "string",
+                },
+              ],
+              internalType: "struct JobMetadata",
+              name: "",
+              type: "tuple",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "getJobs",
+          outputs: [
+            {
+              components: [
+                {
+                  internalType: "uint256",
+                  name: "index",
+                  type: "uint256",
+                },
+                {
+                  internalType: "address",
+                  name: "client",
+                  type: "address",
+                },
+                {
+                  internalType: "uint256",
+                  name: "bounty",
+                  type: "uint256",
+                },
+                {
+                  internalType: "string",
+                  name: "title",
+                  type: "string",
+                },
+                {
+                  internalType: "address",
+                  name: "escrowAddress",
+                  type: "address",
+                },
+                {
+                  internalType: "uint256",
+                  name: "postedTime",
+                  type: "uint256",
+                },
+                {
+                  internalType: "string",
+                  name: "IPFSHash",
+                  type: "string",
+                },
+              ],
+              internalType: "struct JobMetadata[]",
+              name: "",
+              type: "tuple[]",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "uint256",
+              name: "",
+              type: "uint256",
+            },
+          ],
+          name: "jobs",
+          outputs: [
+            {
+              internalType: "uint256",
+              name: "index",
+              type: "uint256",
+            },
+            {
+              internalType: "address",
+              name: "client",
+              type: "address",
+            },
+            {
+              internalType: "uint256",
+              name: "bounty",
+              type: "uint256",
+            },
+            {
+              internalType: "string",
+              name: "title",
+              type: "string",
+            },
+            {
+              internalType: "address",
+              name: "escrowAddress",
+              type: "address",
+            },
+            {
+              internalType: "uint256",
+              name: "postedTime",
+              type: "uint256",
+            },
+            {
+              internalType: "string",
+              name: "IPFSHash",
+              type: "string",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "owner",
+          outputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "view",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "string",
+              name: "_title",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "_IPFSHash",
+              type: "string",
+            },
+            {
+              internalType: "string",
+              name: "tags",
+              type: "string",
+            },
+            {
+              internalType: "enum VerificationMode",
+              name: "_verificationMode",
+              type: "uint8",
+            },
+          ],
+          name: "postJob",
+          outputs: [
+            {
+              internalType: "address",
+              name: "",
+              type: "address",
+            },
+          ],
+          stateMutability: "payable",
+          type: "function",
+        },
+        {
+          inputs: [],
+          name: "renounceOwnership",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+        {
+          inputs: [
+            {
+              internalType: "address",
+              name: "newOwner",
+              type: "address",
+            },
+          ],
+          name: "transferOwnership",
+          outputs: [],
+          stateMutability: "nonpayable",
+          type: "function",
+        },
+      ],
+      inheritedFunctions: {
+        owner: "@openzeppelin/contracts/access/Ownable.sol",
+        renounceOwnership: "@openzeppelin/contracts/access/Ownable.sol",
+        transferOwnership: "@openzeppelin/contracts/access/Ownable.sol",
+      },
+      deployedOnBlock: 243956707,
+    },
+  },
 } as const;
 
 export default deployedContracts satisfies GenericContractsDeclaration;
