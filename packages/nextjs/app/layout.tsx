@@ -17,8 +17,9 @@ const jetBrainsMono = JetBrains_Mono({
 });
 
 export const metadata = getMetadata({
-  title: "MERGE - Prove Your Worth & Get Paid",
-  description: "The 100% On-Chain Gig Protocol. Merge code to unlock ETH.",
+  title: "MERGE - Decentralized Gig Marketplace",
+  description:
+    "The 100% On-Chain Gig Protocol. Built for developers to complete work and claim crypto payouts securely.",
 });
 
 const ScaffoldEthApp = ({ children }: { children: React.ReactNode }) => {
