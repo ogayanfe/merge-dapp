@@ -57,7 +57,7 @@ export const FreelancerControls = ({ job }: FreelancerControlsProps) => {
               type="text"
               value={prUrl}
               onChange={e => {
-                setPrUrl(e.target.value);
+                setPrUrl(e.target.value.toLowerCase());
                 // Basic validation on change could be added, or assume user submits valid URL
               }}
               placeholder="https://github.com/..."

@@ -1,4 +1,5 @@
-export const parseGithubUrl = (url: string) => {
+export const parseGithubUrl = (_url: string) => {
+  const url = _url.toLowerCase();
   try {
     const match = url.match(/github\.com\/([^/]+)\/([^/]+)(\/pull\/(\d+))?/);
     if (!match) return null;
@@ -15,8 +16,8 @@ export const parseGithubUrl = (url: string) => {
 };
 
 export const validatePrAgainstRepo = (prUrl: string, repoUrl: string) => {
-  const pr = parseGithubUrl(prUrl);
-  const repo = parseGithubUrl(repoUrl);
+  const pr = parseGithubUrl(prUrl.toLowerCase());
+  const repo = parseGithubUrl(repoUrl.toLowerCase());
 
   if (!pr || !repo) return false;
 
