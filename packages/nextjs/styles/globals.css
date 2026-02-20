@@ -26,7 +26,7 @@
 
 @layer base {
   * {
-    border-color: var(--color-base-300);
+    border-color: var(--fallback-b3, oklch(var(--b3) / 1));
   }
 
   body {

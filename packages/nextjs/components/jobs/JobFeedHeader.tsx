@@ -34,7 +34,7 @@ export const JobFeedHeader = ({ activeTab, verificationFilter, setVerificationFi
         <button
           onClick={() => setVerificationFilter("ALL")}
           className={`px-4 py-1.5 rounded-md text-[10px] font-black uppercase transition-all ${
-            verificationFilter === "ALL" ? "bg-white shadow-sm text-primary" : "opacity-50 hover:opacity-100"
+            verificationFilter === "ALL" ? "bg-base-100 shadow-sm text-primary" : "opacity-50 hover:opacity-100"
           }`}
         >
           All Types
@@ -42,7 +42,7 @@ export const JobFeedHeader = ({ activeTab, verificationFilter, setVerificationFi
         <button
           onClick={() => setVerificationFilter("GIT")}
           className={`px-4 py-1.5 rounded-md text-[10px] font-black uppercase flex items-center gap-2 transition-all ${
-            verificationFilter === "GIT" ? "bg-white shadow-sm text-primary" : "opacity-50 hover:opacity-100"
+            verificationFilter === "GIT" ? "bg-base-100 shadow-sm text-primary" : "opacity-50 hover:opacity-100"
           }`}
         >
           <CodeBracketIcon className="h-3 w-3" />
@@ -51,7 +51,7 @@ export const JobFeedHeader = ({ activeTab, verificationFilter, setVerificationFi
         <button
           onClick={() => setVerificationFilter("MANUAL")}
           className={`px-4 py-1.5 rounded-md text-[10px] font-black uppercase flex items-center gap-2 transition-all ${
-            verificationFilter === "MANUAL" ? "bg-white shadow-sm text-primary" : "opacity-50 hover:opacity-100"
+            verificationFilter === "MANUAL" ? "bg-base-100 shadow-sm text-primary" : "opacity-50 hover:opacity-100"
           }`}
         >
           <CloudIcon className="h-3 w-3" />
