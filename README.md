@@ -1,95 +1,116 @@
 # Merge — Decentralized Gig Marketplace
 
-Merge is a decentralized gig marketplace that lets clients post jobs and escrow payments on-chain while contractors complete work and claim payouts. This repository contains the smart contracts, deployment scripts, and a Next.js frontend used to demo and develop the Merge protocol.
+<br/>
+<div align="center">
+  <img src="demo/social.png" alt="Merge Protocol" width="100%" />
+</div>
 
-Key features
+<br/>
 
-- On-chain job creation and management (Factory + Job contracts)
-- Secure escrow via `GigEscrow` with release and dispute support
-- Frontend UI for creating/listing jobs, accepting work, and handling payments
-- Local development scripts and a burner wallet experience for fast testing
+## About
 
-Tech stack
+Welcome to the **Merge Protocol**! Merge is a decentralized gig marketplace that lets clients post jobs and escrow payments on-chain, while freelancers and contractors can securely complete work and claim payouts.
 
-- Scaffoled ETH 2
-- Solidity (contracts in `packages/hardhat/contracts`)
-- Hardhat for compilation, testing, and local network (`packages/hardhat`)
-- Next.js + TypeScript frontend (`packages/nextjs`)
-- Viem/Wagmi + RainbowKit for wallet and RPC integration
+By running on-chain, Merge eliminates the need for trusted third parties, heavily reduces fees compared to traditional platforms, and provides a transparent, secure environment for both clients and freelancers.
 
-Requirements
+### 🎥 [Watch the Video Demo](https://www.youtube.com/watch?v=YNMicX9gEmk)
+
+### 🌐 [Try the Live Demo](https://mergeprotocol.netlify.app/)
+
+## Key Features
+
+- **On-Chain Job Management:** Create, manage, and browse gig listings seamlessly through the Factory and Job smart contracts.
+- **Secure Escrow Payments:** Funds are locked in the `GigEscrow` smart contract. Payments are trustlessly released upon job completion.
+- **Built-in Dispute Resolution:** Dispute support allows for fair resolution if a disagreement occurs between client and freelancer.
+- **Intuitive User Interface:** A modern Next.js frontend UI for creating jobs, accepting work, handling communications, and tracking payments.
+- **Developer-Friendly:** Local development scripts and a burner wallet experience allow for rapid testing and iteration.
+
+---
+
+## Tech Stack
+
+- **Framework:** [Scaffold-ETH 2](https://scaffoldeth.io/)
+- **Smart Contracts:** Solidity (contracts located in `packages/hardhat/contracts`)
+- **Blockchain Environment:** Hardhat for local compilation, testing, and network interaction (`packages/hardhat`)
+- **Frontend:** Next.js + TypeScript (`packages/nextjs`)
+- **Web3 Integration:** Viem / Wagmi + RainbowKit for wallet connection and RPC integration
+
+## Requirements
 
 - Node.js (recommended >= 20)
 - Yarn (classic v1 or v2+)
 - Git
 
-Quickstart (local development)
+## Quickstart (Local Development)
 
-1. Clone repository and install dependencies from the repo root:
+1. **Clone the repository and install dependencies:**
 
-```bash
-git clone <repo-url>
-cd merge
-yarn install
-```
+   ```bash
+   git clone <repo-url>
+   cd merge
+   yarn install
+   ```
 
-2. Start a local chain in one terminal:
+2. **Start a local local blockchain:**
 
-```bash
-yarn chain
-```
+   In your first terminal window, run:
 
-3. Deploy contracts to the local chain in a second terminal:
+   ```bash
+   yarn chain
+   ```
 
-```bash
-yarn deploy
-```
+3. **Deploy the smart contracts:**
 
-4. Start the Next.js frontend in a third terminal:
+   In a second terminal window, run:
 
-```bash
-yarn start
-```
+   ```bash
+   yarn deploy
+   ```
 
-Open http://localhost:3000 to use the app. The Debug/Contracts page lets you interact with deployed contracts and view events.
+4. **Start the Next.js frontend:**
 
-Development notes
+   In a third terminal window, run:
 
-- Contracts: `packages/hardhat/contracts` (see `GigEscrow.sol`, `MergeFactory.sol`)
-- Frontend: `packages/nextjs` (app router, pages under `app/`, components in `components/`)
-- Typechain types are generated into `packages/hardhat/typechain-types`
-- Useful scripts (in `packages/hardhat/scripts`): account generation and helper utilities
+   ```bash
+   yarn start
+   ```
 
-Testing & formatting
+Open [http://localhost:3000](http://localhost:3000) to use the app locally. The Debug/Contracts page lets you interact with deployed contracts and view events.
 
-- Run unit tests for contracts:
+## Development Notes
 
-```bash
-yarn hardhat:test
-```
+- **Contracts:** Found in `packages/hardhat/contracts` (check out `GigEscrow.sol` and `MergeFactory.sol`).
+- **Frontend:** Found in `packages/nextjs` (App router pages are under `app/`, and components in `components/`).
+- **Types:** Typechain types automatically generate into `packages/hardhat/typechain-types`.
+- **Scripts:** Useful deployment and utility scripts are in `packages/hardhat/scripts`.
 
-- Format codebase (root command runs format for all packages):
+## Testing & Formatting
 
-```bash
-yarn format
-```
+- **Run unit tests for contracts:**
 
-Environment & secrets
+  ```bash
+  yarn hardhat:test
+  ```
 
-Add any RPC keys or API keys to `.env` at the repo root if you plan to connect to public testnets. Do not commit private keys.
+- **Format the codebase (runs across all packages):**
+  ```bash
+  yarn format
+  ```
 
-Repository layout (high level)
+## Environment & Secrets
 
-- `packages/hardhat` — Solidity contracts, deployments, tests, Hardhat config
-- `packages/nextjs` — Frontend app (React + Next.js), hooks, components
-- `packages/hardhat/deploy` — Deployment scripts used by `yarn deploy`
+Add any necessary RPC or API keys to the `.env` file at the repository root if you plan to connect to public testnets. **Never commit your private keys!**
 
-Contributing
+## Architecture
 
-Contributions, issues, and feature requests are welcome. Please open issues or PRs. For large changes, open an issue first to discuss scope and design.
+- `packages/hardhat`: Solidity smart contracts, deployments, tests, and Hardhat configuration.
+- `packages/nextjs`: React + Next.js frontend application with hooks and UI components.
+- `packages/hardhat/deploy`: Custom deployment scripts used by the `yarn deploy` command.
 
-License
+## Contributing
 
-This project uses the repository license. See `LICENCE` at the repository root for details.
+We welcome contributions, issues, and feature requests! Please open an issue or pull request. For significant changes or new features, please open an issue first to discuss your ideas and the intended design.
 
-If you want additional customization (project badges, screenshots, or developer docs), tell me what to include and I'll add it.
+## License
+
+This project uses the repository license. See the `LICENCE` file at the repository root for more details.
