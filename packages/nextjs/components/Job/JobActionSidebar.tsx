@@ -359,23 +359,27 @@ export const JobActionSidebar = ({ job, isOpen, onClose }: JobActionSidebarProps
 
           <div>
             <h3 className="text-[10px] font-black uppercase tracking-[0.2em] opacity-30 mb-6 flex items-center gap-2">
-              <ClockIcon className="h-4 w-4" /> Activity Protocol
+              <ShieldCheckIcon className="h-4 w-4" /> Escrow Specs
             </h3>
             <div className="space-y-4 font-mono text-[9px]">
-              <div className="flex gap-3">
-                <span className="opacity-20 italic">14:22</span>
-                <span className="opacity-60 underline uppercase">Job Deployed by Client</span>
+              <div className="flex justify-between items-end border-b border-base-content/5 pb-2">
+                <span className="opacity-40 uppercase">Verification Mode</span>
+                <span className="font-black uppercase tracking-widest text-primary">
+                  {job.verificationMode === 0 ? "GITHUB PR" : "MANUAL"}
+                </span>
               </div>
-              <div className="flex gap-3">
-                <span className="opacity-20 italic">14:55</span>
-                <span className="opacity-60 uppercase">Contract Funds Verified</span>
+              <div className="flex justify-between items-end border-b border-base-content/5 pb-2">
+                <span className="opacity-40 uppercase">Applicants</span>
+                <span className="font-black uppercase tracking-widest">{job.applicants?.length || 0} Registered</span>
               </div>
-              {job.freelancer === connectedAddress && (
-                <div className="flex gap-3 text-primary">
-                  <span className="opacity-50 italic">18:42</span>
-                  <span className="font-black uppercase tracking-widest">Protocol Accepted By You</span>
+              {job.autoReleaseDeadline && job.autoReleaseDeadline > 0n ? (
+                <div className="flex justify-between items-end border-b border-base-content/5 pb-2">
+                  <span className="opacity-40 uppercase">Auto Release</span>
+                  <span className="font-black uppercase tracking-widest text-warning">
+                    {new Date(Number(job.autoReleaseDeadline) * 1000).toLocaleDateString()}
+                  </span>
                 </div>
-              )}
+              ) : null}
             </div>
           </div>
         </div>
