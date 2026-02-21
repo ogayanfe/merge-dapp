@@ -104,6 +104,16 @@ export const FreelancerControls = ({ job }: FreelancerControlsProps) => {
     );
   }
 
+  // DISPUTED STATE
+  if (job.status === "DISPUTED") {
+    return (
+      <div className="w-full py-4 bg-warning/20 border border-warning/40 text-warning font-black uppercase text-xs flex items-center justify-center gap-2 animate-pulse">
+        <span className="loading loading-dots loading-xs"></span>
+        Dispute Active
+      </div>
+    );
+  }
+
   // COMPLETED STATE: Withdraw
   if (job.status === "COMPLETED") {
     if (job.bounty > 0n) {
