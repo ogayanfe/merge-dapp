@@ -43,8 +43,11 @@ export const FreelancerControls = ({ job }: FreelancerControlsProps) => {
         createNotification(job.client, `Work Submitted by Freelancer: Review Now`, `/jobs/${address}`, "SUBMISSION");
         notification.success("Work submitted successfully");
       }
+      if (hash === payHash) {
+        notification.success("Funds successfully withdrawn");
+      }
     }
-  }, [isConfirmed, queryClient, hash, submitHash, job.client, address]);
+  }, [isConfirmed, queryClient, hash, submitHash, payHash, job.client, address]);
 
   // LOCKED STATE: Submit Work
   if (job.status === "LOCKED") {

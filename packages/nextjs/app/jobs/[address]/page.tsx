@@ -103,6 +103,9 @@ export default function JobDetailPage() {
   const isFreelancer = connectedAddress?.toLowerCase() === escrowState.freelancer?.toLowerCase();
   const peerAddress = isClient ? escrowState.freelancer : isFreelancer ? escrowState.client : undefined;
 
+  const showChat =
+    status !== "OPEN" && status !== "APPLYING" && connectedAddress && peerAddress && (isClient || isFreelancer);
+
   return (
     <div className="flex h-full bg-base-100 font-mono text-base-content overflow-hidden relative">
       {/* Detail Pane */}
@@ -114,7 +117,9 @@ export default function JobDetailPage() {
       {/* Mobile FAB */}
       <button
         onClick={() => setIsSidebarOpen(true)}
-        className="lg:hidden fixed bottom-6 right-6 z-40 bg-primary text-primary-content p-4 rounded-full shadow-brand-glow hover:scale-110 transition-transform active:scale-95 flex items-center justify-center animate-bounce-in"
+        className={`lg:hidden fixed ${
+          showChat ? "bottom-[6.5rem]" : "bottom-6"
+        } right-6 z-40 bg-primary text-primary-content p-4 rounded-full shadow-brand-glow hover:scale-110 transition-transform active:scale-95 flex items-center justify-center animate-bounce-in`}
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
@@ -128,20 +133,10 @@ export default function JobDetailPage() {
         </svg>
       </button>
 
-      {/* Chat Widget - Visible only to participants when job is not OPEN */}
       {/* Chat Widget - Visible only to participants when job is not OPEN/APPLYING */}
-      {(() => {
-        if (
-          status !== "OPEN" &&
-          status !== "APPLYING" &&
-          connectedAddress &&
-          peerAddress &&
-          (isClient || isFreelancer)
-        ) {
-          return <JobChat jobAddress={address} currentUser={connectedAddress} peerAddress={peerAddress} />;
-        }
-        return null;
-      })()}
+      {showChat ? (
+        <JobChat jobAddress={address} currentUser={connectedAddress as string} peerAddress={peerAddress as string} />
+      ) : null}
     </div>
   );
 }

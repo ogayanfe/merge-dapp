@@ -47,8 +47,8 @@ export const ClientControls = ({ job }: ClientControlsProps) => {
 
   useEffect(() => {
     if (isConfirmed) {
-      // Funds Released (Completion)
       if (hash === completeHash) {
+        queryClient.invalidateQueries();
         createNotification(
           job.freelancer,
           `Funds Released by Client! Job Completed.`,
@@ -57,8 +57,12 @@ export const ClientControls = ({ job }: ClientControlsProps) => {
         );
         notification.success("Job completed and funds released");
       }
+      if (hash === refundHash) {
+        queryClient.invalidateQueries();
+        notification.success("Funds successfully withdrawn");
+      }
     }
-  }, [isConfirmed, hash, completeHash, job.freelancer, address]);
+  }, [isConfirmed, hash, completeHash, refundHash, queryClient, job.freelancer, address]);
 
   const { address: userAddress } = useAccount();
   const [isDisputeModalOpen, setIsDisputeModalOpen] = useState(false);

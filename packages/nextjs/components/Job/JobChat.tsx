@@ -47,7 +47,7 @@ export const JobChat = ({
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-8 right-8 btn btn-primary btn-circle btn-lg shadow-brand-glow z-50 animate-bounce-subtle"
+        className="fixed bottom-6 right-6 lg:bottom-8 lg:right-8 btn btn-primary btn-circle btn-lg shadow-brand-glow z-50 animate-bounce-subtle"
       >
         <svg
           xmlns="http://www.w3.org/2000/svg"
