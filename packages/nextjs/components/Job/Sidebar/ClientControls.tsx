@@ -156,44 +156,7 @@ export const ClientControls = ({ job }: ClientControlsProps) => {
   // IN_REVIEW STATE: Release or Dispute
   if (job.status === "IN_REVIEW" && job.verificationMode === 1) {
     return (
-      <div className="space-y-4">
-        {timeLeft && (
-          <div className="flex items-center gap-2 text-[10px] font-mono opacity-60 bg-base-300/50 p-2 rounded-sm justify-center">
-            <ClockIcon className="h-3 w-3" />
-            Auto-release in: <span className="font-bold text-base-content">{timeLeft}</span>
-          </div>
-        )}
-
-        <button
-          onClick={() => completeJob()}
-          disabled={isActionPending}
-          className="w-full py-4 bg-success text-success-content font-black uppercase text-xs hover:bg-success/90 transition-all shadow-brand-glow flex items-center justify-center gap-2"
-        >
-          {isCompleting ? (
-            <span className="loading loading-spinner loading-xs"></span>
-          ) : (
-            <CheckCircleIcon className="h-4 w-4" />
-          )}
-          Release Funds
-        </button>
-
-        <div className="relative group">
-          <button
-            onClick={() => setIsDisputeModalOpen(true)}
-            disabled={isActionPending}
-            className="w-full py-4 bg-warning/10 text-warning border border-warning/20 font-black uppercase text-xs hover:bg-warning/20 transition-all flex items-center justify-center gap-2"
-          >
-            {isDisputing ? (
-              <span className="loading loading-spinner loading-xs"></span>
-            ) : (
-              <ExclamationTriangleIcon className="h-4 w-4" />
-            )}
-            Raise Dispute
-          </button>
-          <div className="absolute bottom-full left-0 w-full mb-2 hidden group-hover:block p-2 bg-base-300 text-[9px] text-center rounded shadow-lg border border-base-content/10">
-            Warning: 1% fee deducted from disputed amount.
-          </div>
-        </div>
+      <>
         <ModalInput
           isOpen={isDisputeModalOpen}
           onClose={() => setIsDisputeModalOpen(false)}
@@ -202,7 +165,46 @@ export const ClientControls = ({ job }: ClientControlsProps) => {
           label="Provide reason/evidence for dispute"
           placeholder="Describe the issue with the work submitted..."
         />
-      </div>
+        <div className="space-y-4">
+          {timeLeft && (
+            <div className="flex items-center gap-2 text-[10px] font-mono opacity-60 bg-base-300/50 p-2 rounded-sm justify-center">
+              <ClockIcon className="h-3 w-3" />
+              Auto-release in: <span className="font-bold text-base-content">{timeLeft}</span>
+            </div>
+          )}
+
+          <button
+            onClick={() => completeJob()}
+            disabled={isActionPending}
+            className="w-full py-4 bg-success text-success-content font-black uppercase text-xs hover:bg-success/90 transition-all shadow-brand-glow flex items-center justify-center gap-2"
+          >
+            {isCompleting ? (
+              <span className="loading loading-spinner loading-xs"></span>
+            ) : (
+              <CheckCircleIcon className="h-4 w-4" />
+            )}
+            Release Funds
+          </button>
+
+          <div className="relative group">
+            <button
+              onClick={() => setIsDisputeModalOpen(true)}
+              disabled={isActionPending}
+              className="w-full py-4 bg-warning/10 text-warning border border-warning/20 font-black uppercase text-xs hover:bg-warning/20 transition-all flex items-center justify-center gap-2"
+            >
+              {isDisputing ? (
+                <span className="loading loading-spinner loading-xs"></span>
+              ) : (
+                <ExclamationTriangleIcon className="h-4 w-4" />
+              )}
+              Raise Dispute
+            </button>
+            <div className="absolute bottom-full left-0 w-full mb-2 hidden group-hover:block p-2 bg-base-300 text-[9px] text-center rounded shadow-lg border border-base-content/10">
+              Warning: 1% fee deducted from disputed amount.
+            </div>
+          </div>
+        </div>
+      </>
     );
   }
 
