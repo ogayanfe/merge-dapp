@@ -1,3 +1,4 @@
+import { notFound } from "next/navigation";
 import { getMetadata } from "~~/utils/scaffold-eth/getMetadata";
 
 export const metadata = getMetadata({
@@ -6,6 +7,9 @@ export const metadata = getMetadata({
 });
 
 const BlockExplorerLayout = ({ children }: { children: React.ReactNode }) => {
+  if (process.env.NODE_ENV !== "development") {
+    notFound();
+  }
   return <>{children}</>;
 };
 
